@@ -12,6 +12,7 @@ export type Account = {
   username: string;
   displayName: string;
   role: UserRole;
+  temporaryPassword?: string | null;
   createdAt?: string;
 };
 

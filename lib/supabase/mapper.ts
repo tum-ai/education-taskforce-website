@@ -5,6 +5,14 @@ type AccountRow = {
   username: string;
   display_name: string;
   role: UserRole;
+  participant_credentials?:
+    | {
+        temporary_password: string | null;
+      }
+    | Array<{
+        temporary_password: string | null;
+      }>
+    | null;
   created_at?: string;
 };
 
@@ -22,11 +30,16 @@ type DayUploadRow = {
 };
 
 export function mapAccount(row: AccountRow): Account {
+  const credential = Array.isArray(row.participant_credentials)
+    ? row.participant_credentials[0]
+    : row.participant_credentials;
+
   return {
     id: row.id,
     username: row.username,
     displayName: row.display_name,
     role: row.role,
+    temporaryPassword: credential?.temporary_password ?? null,
     createdAt: row.created_at,
   };
 }

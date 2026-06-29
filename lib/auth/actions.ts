@@ -22,6 +22,8 @@ export async function signInWithUsername(username: string, password: string) {
 }
 
 export async function signOut() {
+  "use server";
+
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
   redirect("/login");

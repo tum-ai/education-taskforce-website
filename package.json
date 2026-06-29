@@ -13,7 +13,7 @@
     "typecheck": "tsc --noEmit",
     "supabase:migration": "supabase db push",
     "supabase:test": "supabase test db",
-    "seed:admin": "node scripts/seed-admin.mjs"
+    "seed:admin": "node --env-file=.env.local scripts/seed-admin.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",

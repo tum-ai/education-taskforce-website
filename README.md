@@ -55,18 +55,13 @@ Configure Supabase Auth redirect URLs:
 
 ## First Admin
 
-After `.env.local` is configured, create the first admin with credentials chosen and stored by the project owner:
+After `.env.local` is configured, create or update the first admin:
 
 ```bash
-export ADMIN_USERNAME=admin-user
-export ADMIN_DISPLAY_NAME="Course Admin"
-read -s ADMIN_PASSWORD
-export ADMIN_PASSWORD
 pnpm seed:admin
-unset ADMIN_PASSWORD
 ```
 
-The script does not print the password.
+By default, this creates the username `admin` and prints a generated password. To choose your own credentials, set `ADMIN_USERNAME`, `ADMIN_DISPLAY_NAME`, and `ADMIN_PASSWORD` before running the command. When `ADMIN_PASSWORD` is provided, the script does not print it.
 
 ## Checks
 

@@ -22,7 +22,7 @@ export async function listParticipantAccounts(): Promise<Account[]> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("accounts")
-    .select("*")
+    .select("*, participant_credentials(temporary_password)")
     .eq("role", "participant")
     .order("display_name", { ascending: true });
 
@@ -53,6 +53,19 @@ async function usernameExists(username: string): Promise<boolean> {
   }
 
   return Boolean(data);
+}
+
+async function storeParticipantPassword(accountId: string, temporaryPassword: string): Promise<void> {
+  const admin = createSupabaseAdminClient();
+  const { error } = await admin.from("participant_credentials").upsert({
+    account_id: accountId,
+    temporary_password: temporaryPassword,
+    updated_at: new Date().toISOString(),
+  });
+
+  if (error) {
+    throw new Error("Could not save the participant password for admin sharing.");
+  }
 }
 
 export async function createAvailableParticipantUsername(displayName: string): Promise<string> {
@@ -106,6 +119,13 @@ export async function createParticipantAccount(input: CreateParticipantInput): P
     throw new Error("Could not create the participant account.");
   }
 
+  try {
+    await storeParticipantPassword(authData.user.id, temporaryPassword);
+  } catch (error) {
+    await admin.auth.admin.deleteUser(authData.user.id);
+    throw error;
+  }
+
   return {
     account: mapAccount(accountRow),
     temporaryPassword,
@@ -134,8 +154,15 @@ export async function resetParticipantPassword(accountId: string): Promise<Crede
     throw new Error("Could not reset the password.");
   }
 
+  await storeParticipantPassword(accountId, temporaryPassword);
+
   return {
-    account: mapAccount(accountRow),
+    account: mapAccount({
+      ...accountRow,
+      participant_credentials: {
+        temporary_password: temporaryPassword,
+      },
+    }),
     temporaryPassword,
   };
 }

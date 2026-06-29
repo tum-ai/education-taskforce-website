@@ -44,7 +44,7 @@
 
 .table {
   width: 100%;
-  min-width: 760px;
+  min-width: 980px;
   border-collapse: collapse;
 }
 
@@ -73,4 +73,35 @@
   display: grid;
   gap: 10px;
   min-width: 260px;
+}
+
+.passwordCell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  max-width: 360px;
+}
+
+.passwordCell code {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  border: 1px solid rgb(82 53 115 / 14%);
+  border-radius: var(--radius-sm);
+  background: rgb(246 242 255 / 78%);
+  padding: 8px 10px;
+  color: var(--color-purple-700);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.missingPassword {
+  display: inline-block;
+  max-width: 220px;
+  color: var(--color-grey-600);
+  font-size: 0.9rem;
+  font-weight: 650;
+  line-height: 1.35;
 }

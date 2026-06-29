@@ -6,6 +6,7 @@ playwright-report/
 test-results/
 dist/
 *.tsbuildinfo
+supabase/.temp/
 
 # Local environment files may contain Supabase secrets.
 .env

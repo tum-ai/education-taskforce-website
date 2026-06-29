@@ -1,9 +1,10 @@
 begin;
 
-select plan(12);
+select plan(15);
 
 select has_table('public', 'accounts', 'accounts table exists');
 select has_table('public', 'day_uploads', 'day_uploads table exists');
+select has_table('public', 'participant_credentials', 'participant credentials table exists');
 select ok(
   exists (
     select 1
@@ -38,6 +39,12 @@ select ok(
   ),
   'day_uploads table has RLS policies'
 );
+select ok(
+  exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'participant_credentials'
+  ),
+  'participant_credentials table has RLS policies'
+);
 select is(
   (select rowsecurity from pg_tables where schemaname = 'public' and tablename = 'accounts'),
   true,
@@ -47,6 +54,11 @@ select is(
   (select rowsecurity from pg_tables where schemaname = 'public' and tablename = 'day_uploads'),
   true,
   'day_uploads RLS is enabled'
+);
+select is(
+  (select rowsecurity from pg_tables where schemaname = 'public' and tablename = 'participant_credentials'),
+  true,
+  'participant_credentials RLS is enabled'
 );
 select is(
   (select public from storage.buckets where id = 'participant-uploads'),
