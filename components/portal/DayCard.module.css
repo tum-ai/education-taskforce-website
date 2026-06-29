@@ -1,0 +1,58 @@
+.card {
+  display: grid;
+  min-height: 230px;
+  align-content: start;
+  gap: 12px;
+  border: 1px solid rgb(82 53 115 / 12%);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+  padding: 18px;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: rgb(154 100 217 / 36%);
+  box-shadow: var(--shadow-md);
+}
+
+.topline,
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.topline {
+  color: var(--color-mint-500);
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.card h2 {
+  margin: 0;
+  color: var(--color-indigo-950);
+  font-size: 1.35rem;
+  letter-spacing: 0;
+  line-height: 1.18;
+}
+
+.card p {
+  margin: 0;
+  color: var(--color-grey-700);
+  line-height: 1.55;
+}
+
+.meta {
+  margin-top: auto;
+  justify-content: flex-start;
+  color: var(--color-purple-700);
+  font-weight: 800;
+}

@@ -1,0 +1,78 @@
+.layout {
+  display: grid;
+  gap: 18px;
+}
+
+.panel {
+  display: grid;
+  gap: 18px;
+  border: 1px solid rgb(82 53 115 / 12%);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+  padding: 18px;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--color-purple-700);
+}
+
+.panelHeader h2 {
+  margin: 0;
+  color: var(--color-indigo-950);
+  font-size: 1.2rem;
+}
+
+.panelHeader p {
+  margin: 4px 0 0;
+  color: var(--color-grey-700);
+  line-height: 1.45;
+}
+
+.form {
+  display: grid;
+  gap: 14px;
+  max-width: 620px;
+}
+
+.success {
+  border: 1px solid rgb(30 168 150 / 30%);
+  border-radius: var(--radius-md);
+  background: #f2fffc;
+  color: #096154;
+  font-weight: 800;
+  padding: 12px;
+}
+
+.fileField {
+  display: grid;
+  gap: 7px;
+}
+
+.fileField span:first-child {
+  color: var(--color-indigo-950);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.fileField input {
+  width: 100%;
+  border: 1px solid var(--color-grey-200);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-grey-700);
+  padding: 10px;
+}
+
+.fileError {
+  color: #a53724;
+  font-size: 0.86rem;
+}
+
+.uploads {
+  display: grid;
+  gap: 16px;
+}

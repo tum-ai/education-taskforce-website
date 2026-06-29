@@ -1,0 +1,72 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  border-bottom: 1px solid rgb(82 53 115 / 10%);
+  background: rgb(255 255 255 / 91%);
+  backdrop-filter: blur(16px);
+}
+
+.inner {
+  display: flex;
+  min-height: 68px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 900;
+}
+
+.mark {
+  border-radius: var(--radius-sm);
+  background: var(--color-indigo-950);
+  color: var(--color-white);
+  padding: 7px 9px;
+  font-size: 0.88rem;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  color: var(--color-grey-700);
+  font-weight: 700;
+}
+
+.nav a {
+  color: var(--color-indigo-950);
+}
+
+.account {
+  display: inline-flex;
+  max-width: 240px;
+  min-height: 38px;
+  align-items: center;
+  gap: 7px;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--color-lavender-50);
+  color: var(--color-purple-700);
+  padding: 0 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .inner {
+    flex-wrap: wrap;
+    padding: 12px 0;
+  }
+
+  .nav {
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+}

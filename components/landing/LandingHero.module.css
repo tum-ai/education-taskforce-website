@@ -1,0 +1,136 @@
+.hero {
+  position: relative;
+  min-height: calc(100vh - 68px);
+  overflow: hidden;
+  background: #050506;
+  color: var(--color-white);
+}
+
+.inner {
+  position: relative;
+  display: grid;
+  min-height: calc(100vh - 68px);
+  align-items: center;
+  padding: 28px 0 46px;
+}
+
+.previewPanel {
+  display: grid;
+  width: 100%;
+  min-height: clamp(520px, 74vh, 690px);
+  place-items: center;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: #000000;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 4%);
+}
+
+.heroStack {
+  position: relative;
+  display: grid;
+  width: 100%;
+  place-items: center;
+}
+
+.heroStack h1 {
+  position: relative;
+  z-index: 5;
+  max-width: calc(100% - 64px);
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(3.8rem, 8.8vw, 8.4rem);
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 0.86;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sparklesBand {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  width: min(78rem, calc(100vw - 54px));
+  height: 34rem;
+  transform: translateX(-50%);
+}
+
+.sparklesCanvas {
+  width: 100%;
+  height: 100%;
+}
+
+.glowLine {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 2;
+  width: 88%;
+  height: 1px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, #9a64d9 22%, #f5efff 50%, #523573 78%, transparent 100%);
+  box-shadow:
+    0 0 14px rgb(154 100 217 / 70%),
+    0 0 32px rgb(82 53 115 / 54%);
+}
+
+.glowLine::before,
+.glowLine::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: inherit;
+}
+
+.glowLine::before {
+  height: 6px;
+  transform: translateY(-2px);
+  filter: blur(7px);
+  opacity: 0.9;
+}
+
+.glowLine::after {
+  left: 20%;
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #f5efff 48%, #9a64d9 72%, transparent);
+  filter: blur(1px);
+  opacity: 0.95;
+}
+
+.edgeMask {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: #000000;
+  pointer-events: none;
+  mask-image: radial-gradient(560px 320px at top, transparent 18%, white 78%);
+  -webkit-mask-image: radial-gradient(560px 320px at top, transparent 18%, white 78%);
+}
+
+@media (max-width: 680px) {
+  .hero {
+    min-height: 620px;
+  }
+
+  .inner {
+    min-height: 620px;
+    padding: 24px 0 36px;
+  }
+
+  .previewPanel {
+    min-height: 540px;
+  }
+
+  .heroStack h1 {
+    font-size: clamp(3rem, 18vw, 5.5rem);
+    white-space: normal;
+  }
+
+  .sparklesBand {
+    top: calc(100% + 10px);
+    width: min(44rem, calc(100vw - 28px));
+    height: 22rem;
+  }
+}

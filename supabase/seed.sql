@@ -1,0 +1,2 @@
+-- The first admin account is created by `pnpm seed:admin` after Supabase
+-- environment variables are configured locally. Do not commit credentials here.

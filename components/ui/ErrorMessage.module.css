@@ -1,0 +1,14 @@
+.error {
+  display: grid;
+  gap: 4px;
+  border: 1px solid rgb(242 106 79 / 32%);
+  border-radius: var(--radius-md);
+  background: #fff4f1;
+  color: #802615;
+  padding: 12px;
+}
+
+.error strong,
+.error span {
+  line-height: 1.4;
+}

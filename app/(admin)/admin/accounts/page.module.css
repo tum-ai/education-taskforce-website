@@ -1,0 +1,32 @@
+.page {
+  padding: 42px 0 72px;
+}
+
+.header {
+  display: grid;
+  max-width: 760px;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.header span {
+  color: var(--color-purple-700);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.header h1 {
+  margin: 0;
+  color: var(--color-indigo-950);
+  font-size: clamp(2.2rem, 6vw, 4.5rem);
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.header p {
+  margin: 0;
+  color: var(--color-grey-700);
+  font-size: 1.06rem;
+  line-height: 1.55;
+}
