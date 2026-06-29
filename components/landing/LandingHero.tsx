@@ -17,7 +17,7 @@ export function LandingHero() {
                 maxParticles={12000}
                 particleDensity={32000}
                 className={styles.sparklesCanvas}
-                particleColor="#FFFFFF"
+                particleColor="#F5EFFF"
                 speed={0.38}
               />
               <div className={styles.edgeMask} />

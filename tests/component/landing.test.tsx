@@ -7,7 +7,7 @@ describe("ProgramPreview", () => {
   it("renders exactly five day previews", () => {
     render(<ProgramPreview />);
 
-    expect(screen.getByRole("heading", { name: /five days/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /kids and teens/i })).toBeInTheDocument();
     expect(screen.getAllByText(/^Day \d$/)).toHaveLength(5);
   });
 });

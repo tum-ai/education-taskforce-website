@@ -88,7 +88,7 @@ export function AccountManagement({ accounts, createAction, resetAction }: Accou
             error={state.fieldErrors?.displayName}
             label="Display name"
             name="displayName"
-            placeholder="Family Fuchs"
+            placeholder="Student Group A"
             required
           />
           <TextInput
@@ -96,7 +96,7 @@ export function AccountManagement({ accounts, createAction, resetAction }: Accou
             helperText="Leave blank to generate one."
             label="Username"
             name="username"
-            placeholder="family-fuchs"
+            placeholder="student-group-a"
           />
           <Button disabled={isPending} icon={<KeyRound aria-hidden="true" size={18} />} type="submit">
             {isPending ? "Creating..." : "Create account"}

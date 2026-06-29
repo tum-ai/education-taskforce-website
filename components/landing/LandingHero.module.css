@@ -105,8 +105,8 @@
   z-index: 3;
   background: #000000;
   pointer-events: none;
-  mask-image: radial-gradient(560px 320px at top, transparent 18%, white 78%);
-  -webkit-mask-image: radial-gradient(560px 320px at top, transparent 18%, white 78%);
+  mask-image: radial-gradient(720px 430px at top, transparent 32%, white 92%);
+  -webkit-mask-image: radial-gradient(720px 430px at top, transparent 32%, white 92%);
 }
 
 @media (max-width: 680px) {

@@ -6,7 +6,7 @@ export const metadata: Metadata = {
     default: "AI Edutainment | Schloss Elmau",
     template: "%s | AI Edutainment",
   },
-  description: "A private five-day AI course portal for Schloss Elmau families.",
+  description: "A private five-day AI course portal for Schloss Elmau students aged 12-18.",
 };
 
 export default function RootLayout({
