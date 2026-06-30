@@ -24,6 +24,7 @@ export function AppHeader({ account }: AppHeaderProps) {
             <>
               <Link href="/admin/accounts">Accounts</Link>
               <Link href="/admin/uploads">Uploads</Link>
+              <Link href="/admin/langdock">Langdock QR</Link>
             </>
           ) : (
             <Link href="/portal">Portal</Link>
