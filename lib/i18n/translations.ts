@@ -57,6 +57,8 @@ const translations = {
     "portal.whoDescription":
       "We are a student initiative from the Technical University of Munich helping young people explore AI through hands-on projects, creativity, and responsible technology.",
     "portal.whoMeta": "Back to landing page",
+    "portal.viewOutcomes": "View outcomes",
+    "portal.learnMore": "Learn more",
     "day.allDays": "All days",
     "day.noOutcomes": "No outcomes yet",
     "day.noOutcomesBody": "The course team has not added files for this day yet.",
@@ -220,6 +222,8 @@ const translations = {
     "portal.whoDescription":
       "Wir sind eine Studierendeninitiative der Technischen Universität München und helfen jungen Menschen, KI durch eigene Projekte, Kreativität und verantwortungsvolle Technologie zu entdecken.",
     "portal.whoMeta": "Zurück zur Startseite",
+    "portal.viewOutcomes": "Ergebnisse ansehen",
+    "portal.learnMore": "Mehr erfahren",
     "day.allDays": "Alle Tage",
     "day.noOutcomes": "Noch keine Ergebnisse",
     "day.noOutcomesBody": "Das Kursteam hat für diesen Tag noch keine Dateien hinzugefügt.",
