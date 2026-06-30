@@ -1,0 +1,36 @@
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid rgb(154 100 217 / 28%);
+  border-radius: var(--radius-md);
+  background: rgb(255 255 255 / 8%);
+  box-shadow: var(--shadow-sm);
+}
+
+.toggle button {
+  min-width: 38px;
+  min-height: 34px;
+  background: transparent;
+  color: currentColor;
+  padding: 0 9px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1;
+  transition:
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.toggle button[aria-pressed="true"] {
+  background: var(--color-lavender-500);
+  color: #050506;
+}
+
+.toggle button:hover {
+  background: rgb(154 100 217 / 18%);
+}
+
+.toggle button[aria-pressed="true"]:hover {
+  background: var(--color-lavender-500);
+}

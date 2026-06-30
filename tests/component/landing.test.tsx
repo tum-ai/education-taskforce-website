@@ -5,7 +5,7 @@ import { ProgramPreview } from "@/components/landing/ProgramPreview";
 
 describe("ProgramPreview", () => {
   it("renders exactly five day previews", () => {
-    render(<ProgramPreview />);
+    render(<ProgramPreview locale="en" />);
 
     expect(screen.getByRole("heading", { name: /kids and teens/i })).toBeInTheDocument();
     expect(screen.getAllByText(/^Day \d$/)).toHaveLength(5);

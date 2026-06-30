@@ -2,6 +2,7 @@
 
 import { requireAdmin } from "@/lib/auth/current-account";
 import { createParticipantAccount, resetParticipantPassword } from "@/lib/data/accounts";
+import { LOCALE_COOKIE, normalizeLocale, translate } from "@/lib/i18n/translations";
 import { createLoginQrDataUrl } from "@/lib/qr/qrcode";
 import { participantAccountSchema } from "@/lib/validation/auth";
 
@@ -30,6 +31,7 @@ export async function createParticipantFormAction(
   formData: FormData,
 ): Promise<AccountActionState> {
   await requireAdmin();
+  const locale = normalizeLocale(formData.get(LOCALE_COOKIE));
 
   const parsed = participantAccountSchema.safeParse({
     username: formData.get("username"),
@@ -52,7 +54,7 @@ export async function createParticipantFormAction(
     return {
       ...idleState,
       status: "success",
-      message: "Participant account created.",
+      message: translate(locale, "admin.participantCreated"),
       credential: {
         accountId: result.account.id,
         username: result.account.username,
@@ -65,7 +67,7 @@ export async function createParticipantFormAction(
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Could not create the participant account.",
+      message: error instanceof Error ? error.message : translate(locale, "admin.couldNotCreateParticipant"),
     };
   }
 }
@@ -75,11 +77,12 @@ export async function resetParticipantPasswordFormAction(
   formData: FormData,
 ): Promise<AccountActionState> {
   await requireAdmin();
+  const locale = normalizeLocale(formData.get(LOCALE_COOKIE));
 
   const accountId = String(formData.get("accountId") ?? "");
 
   if (!accountId) {
-    return { status: "error", message: "Choose a participant account." };
+    return { status: "error", message: translate(locale, "admin.chooseParticipantAccount") };
   }
 
   try {
@@ -88,7 +91,7 @@ export async function resetParticipantPasswordFormAction(
 
     return {
       status: "success",
-      message: "Password reset.",
+      message: translate(locale, "admin.passwordReset"),
       credential: {
         accountId: result.account.id,
         username: result.account.username,
@@ -101,7 +104,7 @@ export async function resetParticipantPasswordFormAction(
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Could not reset the password.",
+      message: error instanceof Error ? error.message : translate(locale, "admin.couldNotResetPassword"),
     };
   }
 }

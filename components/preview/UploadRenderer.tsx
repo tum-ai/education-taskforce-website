@@ -1,10 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 import { Code2, Download, FileArchive, FileImage, FileText } from "lucide-react";
 import type { DayUpload } from "@/lib/domain/types";
+import { DEFAULT_LOCALE, translate, type Locale } from "@/lib/i18n/translations";
 import { LinkButton } from "@/components/ui/Button";
 import styles from "./UploadRenderer.module.css";
 
 type UploadRendererProps = {
+  locale?: Locale;
   upload: DayUpload;
 };
 
@@ -16,7 +18,7 @@ const iconByType = {
   other: FileArchive,
 };
 
-export function UploadRenderer({ upload }: UploadRendererProps) {
+export function UploadRenderer({ locale = DEFAULT_LOCALE, upload }: UploadRendererProps) {
   const downloadHref = `/api/download/${upload.id}`;
   const Icon = iconByType[upload.fileType];
 
@@ -49,7 +51,7 @@ export function UploadRenderer({ upload }: UploadRendererProps) {
 
       <div className={styles.actions}>
         <LinkButton href={downloadHref} icon={<Download aria-hidden="true" size={18} />} size="sm" variant="secondary">
-          {upload.fileType === "html" ? "Download source" : "Download"}
+          {upload.fileType === "html" ? translate(locale, "upload.downloadSource") : translate(locale, "upload.download")}
         </LinkButton>
       </div>
     </article>

@@ -1,12 +1,23 @@
 import { PublicHeader } from "@/components/layout/PublicHeader";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n/translations";
 import styles from "./LegalPages.module.css";
 
 const registeredOfficeAddressLine = "Arcisstr. 21, 80333 München";
 
-function LegalShell({ children, title, titleSize = "lg" }: { children: React.ReactNode; title: string; titleSize?: "md" | "lg" }) {
+function LegalShell({
+  children,
+  locale,
+  title,
+  titleSize = "lg",
+}: {
+  children: React.ReactNode;
+  locale: Locale;
+  title: string;
+  titleSize?: "md" | "lg";
+}) {
   return (
     <>
-      <PublicHeader />
+      <PublicHeader locale={locale} />
       <main className={styles.page}>
         <section className={styles.hero}>
           <div className={styles.heroInner}>
@@ -21,9 +32,9 @@ function LegalShell({ children, title, titleSize = "lg" }: { children: React.Rea
   );
 }
 
-export function ImprintPageContent() {
+export function ImprintPageContent({ locale = DEFAULT_LOCALE }: { locale?: Locale }) {
   return (
-    <LegalShell title="Impressum">
+    <LegalShell locale={locale} title="Impressum">
       <section className={styles.section}>
         <h2>Organisation</h2>
         <p>
@@ -77,9 +88,9 @@ export function ImprintPageContent() {
   );
 }
 
-export function DisclaimerPageContent() {
+export function DisclaimerPageContent({ locale = DEFAULT_LOCALE }: { locale?: Locale }) {
   return (
-    <LegalShell title="Disclaimer">
+    <LegalShell locale={locale} title="Disclaimer">
       <section className={styles.section}>
         <p>
           We are not an educational program. That means you are not only joining to learn but also to contribute to the
@@ -93,9 +104,9 @@ export function DisclaimerPageContent() {
   );
 }
 
-export function DataPrivacyPageContent() {
+export function DataPrivacyPageContent({ locale = DEFAULT_LOCALE }: { locale?: Locale }) {
   return (
-    <LegalShell title="Datenschutzerklärung TUM.ai e.V." titleSize="md">
+    <LegalShell locale={locale} title="Datenschutzerklärung TUM.ai e.V." titleSize="md">
       <section className={styles.section}>
         <h2>1. Name und Kontaktdaten des für die Verarbeitung Verantwortlichen</h2>
         <p>Diese Datenschutz-Information gilt für die Datenverarbeitung durch die</p>

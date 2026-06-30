@@ -5,6 +5,7 @@ import { useActionState, useEffect, useState } from "react";
 import { Check, Copy, Printer, Upload } from "lucide-react";
 import type { LangdockImportActionState } from "@/app/(admin)/admin/langdock/actions";
 import { DEFAULT_LANGDOCK_LOGIN_URL, type LangdockCredentialCard } from "@/lib/domain/langdock";
+import { LOCALE_COOKIE, translate, type Locale } from "@/lib/i18n/translations";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -18,6 +19,7 @@ type LangdockCredentialManagementProps = {
     previousState: LangdockImportActionState,
     formData: FormData,
   ) => Promise<LangdockImportActionState>;
+  locale: Locale;
   loadError?: string;
 };
 
@@ -33,6 +35,7 @@ export function LangdockCredentialManagement({
   credentials,
   detectedOrigin,
   importAction,
+  locale,
   loadError,
 }: LangdockCredentialManagementProps) {
   const [state, formAction, isPending] = useActionState(importAction, initialState);
@@ -54,46 +57,51 @@ export function LangdockCredentialManagement({
         <div className={styles.panelHeader}>
           <Upload aria-hidden="true" size={20} />
           <div>
-            <h2 id="import-title">Import Langdock credentials</h2>
-            <p>Use headers: label, email, password, group, device, loginUrl.</p>
+            <h2 id="import-title">{translate(locale, "admin.importLangdock")}</h2>
+            <p>{translate(locale, "admin.importLangdockBody")}</p>
           </div>
         </div>
         <form action={formAction} className={styles.form}>
-          {loadError ? <ErrorMessage message={loadError} title="Storage setup needed" /> : null}
+          <input name={LOCALE_COOKIE} type="hidden" value={locale} />
+          {loadError ? <ErrorMessage message={loadError} title={translate(locale, "admin.storageSetupNeeded")} /> : null}
           {state.message && state.status === "error" ? (
-            <ErrorMessage message={state.message} title="Import failed" />
+            <ErrorMessage message={state.message} title={translate(locale, "admin.importFailed")} />
           ) : null}
           {state.message && state.status === "success" ? <p className={styles.success}>{state.message}</p> : null}
           {state.errors && state.errors.length > 0 ? (
             <div className={styles.errors}>
               {state.errors.map((error, index) => (
                 <p key={`${error.row}-${error.field}-${index}`}>
-                  Row {error.row}, {error.field}: {error.message}
+                  {translate(locale, "admin.rowError", {
+                    field: error.field,
+                    message: error.message,
+                    row: error.row,
+                  })}
                 </p>
               ))}
             </div>
           ) : null}
           <TextInput
-            helperText={`QR links use ${detectedOrigin}`}
-            label="Hosted QR origin"
+            helperText={translate(locale, "admin.qrLinksUse", { origin: detectedOrigin })}
+            label={translate(locale, "admin.hostedQrOrigin")}
             name="detectedOrigin"
             readOnly
             value={detectedOrigin}
           />
           <TextInput
             defaultValue={DEFAULT_LANGDOCK_LOGIN_URL}
-            label="Default Langdock URL"
+            label={translate(locale, "admin.defaultLangdockUrl")}
             name="defaultLoginUrl"
             required
             type="url"
           />
           <label className={styles.field} htmlFor="langdock-csv">
-            <span>CSV accounts</span>
+            <span>{translate(locale, "admin.csvAccounts")}</span>
             <textarea id="langdock-csv" name="csv" required spellCheck={false} defaultValue={sampleCsv} />
           </label>
           <div className={styles.actions}>
             <Button disabled={isPending} icon={<Upload aria-hidden="true" size={18} />} type="submit">
-              {isPending ? "Importing..." : "Import credentials"}
+              {isPending ? translate(locale, "admin.importing") : translate(locale, "admin.importCredentials")}
             </Button>
             <Button
               disabled={cards.length === 0}
@@ -102,7 +110,7 @@ export function LangdockCredentialManagement({
               type="button"
               variant="secondary"
             >
-              Print QR cards
+              {translate(locale, "admin.printQrCards")}
             </Button>
           </div>
         </form>
@@ -112,25 +120,31 @@ export function LangdockCredentialManagement({
         <div className={`${styles.panelHeader} ${styles.noPrint}`}>
           <Printer aria-hidden="true" size={20} />
           <div>
-            <h2 id="qr-title">QR cards</h2>
-            <p>{cards.length === 1 ? "1 printable card" : `${cards.length} printable cards`}</p>
+            <h2 id="qr-title">{translate(locale, "admin.qrCards")}</h2>
+            <p>
+              {cards.length === 1
+                ? translate(locale, "admin.printableCard")
+                : translate(locale, "admin.printableCards", { count: cards.length })}
+            </p>
           </div>
         </div>
         {cards.length > 0 ? (
           <div className={styles.grid}>
             {cards.map((credential) => (
-              <LangdockQrCard key={credential.id} credential={credential} />
+              <LangdockQrCard key={credential.id} credential={credential} locale={locale} />
             ))}
           </div>
         ) : (
-          <EmptyState title="No Langdock QR cards yet">Import credentials to generate the first QR cards.</EmptyState>
+          <EmptyState title={translate(locale, "admin.noLangdockCards")}>
+            {translate(locale, "admin.noLangdockCardsBody")}
+          </EmptyState>
         )}
       </section>
     </div>
   );
 }
 
-function LangdockQrCard({ credential }: { credential: LangdockCredentialCard }) {
+function LangdockQrCard({ credential, locale }: { credential: LangdockCredentialCard; locale: Locale }) {
   const [copied, setCopied] = useState(false);
   const meta = [credential.group, credential.device].filter(Boolean).join(" / ");
 
@@ -147,9 +161,9 @@ function LangdockQrCard({ credential }: { credential: LangdockCredentialCard }) 
       </div>
       <div className={styles.cardBody}>
         <h3>{credential.label}</h3>
-        {meta ? <p>{meta}</p> : <p>Langdock login</p>}
+        {meta ? <p>{meta}</p> : <p>{translate(locale, "admin.langdockLogin")}</p>}
         <code>{credential.email}</code>
-        <span>Password available after scan</span>
+        <span>{translate(locale, "admin.passwordAvailableAfterScan")}</span>
       </div>
       <Button
         className={styles.copyButton}
@@ -159,7 +173,7 @@ function LangdockQrCard({ credential }: { credential: LangdockCredentialCard }) 
         type="button"
         variant="ghost"
       >
-        {copied ? "Copied" : "Copy link"}
+        {copied ? translate(locale, "admin.copied") : translate(locale, "admin.copyLink")}
       </Button>
     </article>
   );

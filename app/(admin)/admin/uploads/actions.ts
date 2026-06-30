@@ -6,6 +6,7 @@ import { createUploadId, createUploadRecord } from "@/lib/data/uploads";
 import { classifyUploadFile } from "@/lib/files/classify";
 import { deletePrivateFile, uploadPrivateFile } from "@/lib/storage/uploads";
 import { createUploadStoragePath } from "@/lib/storage/paths";
+import { LOCALE_COOKIE, normalizeLocale, translate } from "@/lib/i18n/translations";
 import { uploadMetadataSchema, validateUploadFile } from "@/lib/validation/uploads";
 import type { DayNumber } from "@/lib/domain/types";
 
@@ -20,13 +21,14 @@ export async function uploadOutcomeFormAction(
   formData: FormData,
 ): Promise<UploadActionState> {
   await requireAdmin();
+  const locale = normalizeLocale(formData.get(LOCALE_COOKIE));
 
   const file = formData.get("file");
   if (!(file instanceof File)) {
     return {
       status: "error",
       fieldErrors: {
-        file: "Choose one file to upload.",
+        file: translate(locale, "admin.chooseFile"),
       },
     };
   }
@@ -80,11 +82,11 @@ export async function uploadOutcomeFormAction(
     await deletePrivateFile(storagePath).catch(() => undefined);
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Could not upload the file.",
+      message: error instanceof Error ? error.message : translate(locale, "admin.couldNotUploadFile"),
     };
   }
 
   revalidatePath("/admin/uploads");
   revalidatePath("/portal");
-  return { status: "success", message: "Upload saved." };
+  return { status: "success", message: translate(locale, "admin.uploadSaved") };
 }

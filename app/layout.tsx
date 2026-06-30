@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { GlobalBackButton } from "@/components/layout/GlobalBackButton";
+import { getRequestLocale } from "@/lib/i18n/server";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
@@ -10,15 +11,17 @@ export const metadata: Metadata = {
   description: "A private five-day AI course portal for Schloss Elmau students aged 12-18.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getRequestLocale();
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body>
-        <GlobalBackButton />
+        <GlobalBackButton locale={locale} />
         {children}
       </body>
     </html>

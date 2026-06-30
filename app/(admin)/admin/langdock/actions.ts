@@ -8,6 +8,7 @@ import {
   DEFAULT_LANGDOCK_LOGIN_URL,
 } from "@/lib/domain/langdock";
 import { importLangdockCredentialsFromCsv } from "@/lib/data/langdock-credentials";
+import { LOCALE_COOKIE, normalizeLocale, translate } from "@/lib/i18n/translations";
 import { getCurrentRequestOrigin } from "@/lib/qr/origin";
 
 export type LangdockImportActionState = {
@@ -22,6 +23,7 @@ export async function importLangdockCredentialsFormAction(
   formData: FormData,
 ): Promise<LangdockImportActionState> {
   await requireAdmin();
+  const locale = normalizeLocale(formData.get(LOCALE_COOKIE));
 
   const csv = String(formData.get("csv") ?? "");
   const defaultLoginUrl = String(formData.get("defaultLoginUrl") ?? DEFAULT_LANGDOCK_LOGIN_URL);
@@ -35,7 +37,7 @@ export async function importLangdockCredentialsFormAction(
     if (result.status === "error") {
       return {
         status: "error",
-        message: "Import blocked.",
+        message: translate(locale, "admin.importBlocked"),
         errors: result.errors,
       };
     }
@@ -44,13 +46,16 @@ export async function importLangdockCredentialsFormAction(
 
     return {
       status: "success",
-      message: `Imported ${result.importedCount} Langdock credential${result.importedCount === 1 ? "" : "s"}.`,
+      message:
+        result.importedCount === 1
+          ? translate(locale, "admin.importedLangdockOne")
+          : translate(locale, "admin.importedLangdockMany", { count: result.importedCount }),
       credentials: result.credentials,
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Could not import Langdock credentials.",
+      message: error instanceof Error ? error.message : translate(locale, "admin.couldNotImportLangdock"),
     };
   }
 }

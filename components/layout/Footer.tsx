@@ -1,7 +1,12 @@
 import Link from "next/link";
+import { translate, type Locale } from "@/lib/i18n/translations";
 import styles from "./Footer.module.css";
 
-export function Footer() {
+type FooterProps = {
+  locale: Locale;
+};
+
+export function Footer({ locale }: FooterProps) {
   return (
     <footer className={styles.footer}>
       <div className={styles.gridOverlay} />
@@ -15,7 +20,7 @@ export function Footer() {
             </div>
             <div className={styles.linksGrid}>
               <div className={styles.column}>
-                <p className={styles.heading}>Connect</p>
+                <p className={styles.heading}>{translate(locale, "footer.connect")}</p>
                 <ul className={styles.list}>
                   <li>
                     <a
@@ -64,27 +69,27 @@ export function Footer() {
                 </ul>
               </div>
               <div className={styles.column}>
-                <p className={styles.heading}>Legal</p>
+                <p className={styles.heading}>{translate(locale, "footer.legal")}</p>
                 <ul className={styles.list}>
                   <li>
                     <Link className={styles.link} href="/imprint">
-                      Imprint
+                      {translate(locale, "footer.imprint")}
                     </Link>
                   </li>
                   <li>
                     <Link className={styles.link} href="/data-privacy">
-                      Data Privacy
+                      {translate(locale, "footer.dataPrivacy")}
                     </Link>
                   </li>
                   <li>
                     <Link className={styles.link} href="/disclaimer">
-                      Disclaimer
+                      {translate(locale, "footer.disclaimer")}
                     </Link>
                   </li>
                 </ul>
               </div>
               <div className={styles.column}>
-                <p className={styles.heading}>Contribute</p>
+                <p className={styles.heading}>{translate(locale, "footer.contribute")}</p>
                 <ul className={styles.list}>
                   <li>
                     <a
@@ -101,7 +106,7 @@ export function Footer() {
             </div>
           </div>
           <div className={styles.bottom}>
-            <p>TUM.ai - Student Initiative at Technical University of Munich</p>
+            <p>{translate(locale, "footer.bottom")}</p>
           </div>
         </div>
       </section>

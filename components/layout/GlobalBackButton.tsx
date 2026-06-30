@@ -2,9 +2,14 @@
 
 import { ArrowLeft } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { translate, type Locale } from "@/lib/i18n/translations";
 import styles from "./GlobalBackButton.module.css";
 
-export function GlobalBackButton() {
+type GlobalBackButtonProps = {
+  locale: Locale;
+};
+
+export function GlobalBackButton({ locale }: GlobalBackButtonProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -22,9 +27,9 @@ export function GlobalBackButton() {
   }
 
   return (
-    <button aria-label="Go back" className={styles.backButton} onClick={goBack} type="button">
+    <button aria-label={translate(locale, "nav.back")} className={styles.backButton} onClick={goBack} type="button">
       <ArrowLeft aria-hidden="true" size={16} />
-      <span>Back</span>
+      <span>{translate(locale, "nav.back")}</span>
     </button>
   );
 }

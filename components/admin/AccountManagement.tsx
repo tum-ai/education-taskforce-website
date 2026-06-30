@@ -3,6 +3,7 @@
 import { useActionState, useCallback, useEffect, useState } from "react";
 import { Check, Copy, KeyRound, Plus, RotateCcw } from "lucide-react";
 import type { Account } from "@/lib/domain/types";
+import { LOCALE_COOKIE, translate, type Locale } from "@/lib/i18n/translations";
 import type { AccountActionState, CredentialActionResult } from "@/app/(admin)/admin/accounts/actions";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -14,6 +15,7 @@ import styles from "./AccountManagement.module.css";
 type AccountManagementProps = {
   accounts: Account[];
   createAction: (previousState: AccountActionState, formData: FormData) => Promise<AccountActionState>;
+  locale: Locale;
   resetAction: (previousState: AccountActionState, formData: FormData) => Promise<AccountActionState>;
 };
 
@@ -46,12 +48,12 @@ function upsertCredentialAccount(accounts: Account[], credential: CredentialActi
   return nextAccounts.sort((first, second) => first.displayName.localeCompare(second.displayName));
 }
 
-function PasswordCell({ password }: { password?: string | null }) {
+function PasswordCell({ locale, password }: { locale: Locale; password?: string | null }) {
   const [copied, setCopied] = useState(false);
   const passwordValue = password ?? "";
 
   if (!passwordValue) {
-    return <span className={styles.missingPassword}>Reset once to save password</span>;
+    return <span className={styles.missingPassword}>{translate(locale, "admin.resetToSave")}</span>;
   }
 
   async function copyPassword() {
@@ -64,14 +66,14 @@ function PasswordCell({ password }: { password?: string | null }) {
     <div className={styles.passwordCell}>
       <code>{passwordValue}</code>
       <Button
-        aria-label={copied ? "Password copied" : "Copy password"}
+        aria-label={copied ? translate(locale, "admin.passwordCopied") : translate(locale, "admin.copyPassword")}
         icon={copied ? <Check aria-hidden="true" size={15} /> : <Copy aria-hidden="true" size={15} />}
         onClick={copyPassword}
         size="sm"
         type="button"
         variant="ghost"
       >
-        {copied ? "Copied" : "Copy"}
+        {copied ? translate(locale, "admin.copied") : translate(locale, "admin.copy")}
       </Button>
     </div>
   );
@@ -79,10 +81,12 @@ function PasswordCell({ password }: { password?: string | null }) {
 
 function ResetPasswordForm({
   account,
+  locale,
   onCredential,
   resetAction,
 }: {
   account: Account;
+  locale: Locale;
   onCredential: (credential: CredentialActionResult) => void;
   resetAction: AccountManagementProps["resetAction"];
 }) {
@@ -99,11 +103,14 @@ function ResetPasswordForm({
   return (
     <div className={styles.resetCell}>
       {state.credential && visible ? (
-        <CredentialCard credential={state.credential} onDismiss={() => setVisible(false)} />
+        <CredentialCard credential={state.credential} locale={locale} onDismiss={() => setVisible(false)} />
       ) : null}
-      {state.message && state.status === "error" ? <ErrorMessage message={state.message} title="Reset failed" /> : null}
+      {state.message && state.status === "error" ? (
+        <ErrorMessage message={state.message} title={translate(locale, "admin.resetFailed")} />
+      ) : null}
       <form action={formAction}>
         <input name="accountId" type="hidden" value={account.id} />
+        <input name={LOCALE_COOKIE} type="hidden" value={locale} />
         <Button
           disabled={isPending}
           icon={<RotateCcw aria-hidden="true" size={16} />}
@@ -111,14 +118,14 @@ function ResetPasswordForm({
           type="submit"
           variant="secondary"
         >
-          {isPending ? "Resetting..." : "Reset password"}
+          {isPending ? translate(locale, "admin.resetting") : translate(locale, "admin.resetPassword")}
         </Button>
       </form>
     </div>
   );
 }
 
-export function AccountManagement({ accounts, createAction, resetAction }: AccountManagementProps) {
+export function AccountManagement({ accounts, createAction, locale, resetAction }: AccountManagementProps) {
   const [state, formAction, isPending] = useActionState(createAction, initialState);
   const [credentialVisible, setCredentialVisible] = useState(true);
   const [participantAccounts, setParticipantAccounts] = useState(accounts);
@@ -143,31 +150,34 @@ export function AccountManagement({ accounts, createAction, resetAction }: Accou
         <div className={styles.panelHeader}>
           <Plus aria-hidden="true" size={20} />
           <div>
-            <h2 id="create-account-title">Create participant</h2>
-            <p>Creates a Supabase login and a participant account row.</p>
+            <h2 id="create-account-title">{translate(locale, "admin.createParticipant")}</h2>
+            <p>{translate(locale, "admin.createParticipantBody")}</p>
           </div>
         </div>
         <form action={formAction} className={styles.form}>
-          {state.message && state.status === "error" ? <ErrorMessage message={state.message} title="Creation failed" /> : null}
+          <input name={LOCALE_COOKIE} type="hidden" value={locale} />
+          {state.message && state.status === "error" ? (
+            <ErrorMessage message={state.message} title={translate(locale, "admin.creationFailed")} />
+          ) : null}
           {state.credential && credentialVisible ? (
-            <CredentialCard credential={state.credential} onDismiss={() => setCredentialVisible(false)} />
+            <CredentialCard credential={state.credential} locale={locale} onDismiss={() => setCredentialVisible(false)} />
           ) : null}
           <TextInput
             error={state.fieldErrors?.displayName}
-            label="Display name"
+            label={translate(locale, "admin.displayName")}
             name="displayName"
             placeholder="Student Group A"
             required
           />
           <TextInput
             error={state.fieldErrors?.username}
-            helperText="Leave blank to generate one."
-            label="Username"
+            helperText={translate(locale, "admin.leaveBlankUsername")}
+            label={translate(locale, "admin.username")}
             name="username"
             placeholder="student-group-a"
           />
           <Button disabled={isPending} icon={<KeyRound aria-hidden="true" size={18} />} type="submit">
-            {isPending ? "Creating..." : "Create account"}
+            {isPending ? translate(locale, "admin.creating") : translate(locale, "admin.createAccount")}
           </Button>
         </form>
       </section>
@@ -176,8 +186,12 @@ export function AccountManagement({ accounts, createAction, resetAction }: Accou
         <div className={styles.panelHeader}>
           <KeyRound aria-hidden="true" size={20} />
           <div>
-            <h2 id="participant-list-title">Participant accounts</h2>
-            <p>{participantAccounts.length === 1 ? "1 account" : `${participantAccounts.length} accounts`}</p>
+            <h2 id="participant-list-title">{translate(locale, "admin.participantAccounts")}</h2>
+            <p>
+              {participantAccounts.length === 1
+                ? translate(locale, "admin.account")
+                : translate(locale, "admin.accounts", { count: participantAccounts.length })}
+            </p>
           </div>
         </div>
         {participantAccounts.length > 0 ? (
@@ -185,11 +199,11 @@ export function AccountManagement({ accounts, createAction, resetAction }: Accou
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Username</th>
-                  <th>Password</th>
-                  <th>Role</th>
-                  <th>Credentials</th>
+                  <th>{translate(locale, "admin.name")}</th>
+                  <th>{translate(locale, "admin.username")}</th>
+                  <th>{translate(locale, "admin.password")}</th>
+                  <th>{translate(locale, "admin.role")}</th>
+                  <th>{translate(locale, "admin.credentialsColumn")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -198,11 +212,11 @@ export function AccountManagement({ accounts, createAction, resetAction }: Accou
                     <td>{account.displayName}</td>
                     <td>{account.username}</td>
                     <td>
-                      <PasswordCell password={account.temporaryPassword} />
+                      <PasswordCell locale={locale} password={account.temporaryPassword} />
                     </td>
                     <td>{account.role}</td>
                     <td>
-                      <ResetPasswordForm account={account} onCredential={handleCredential} resetAction={resetAction} />
+                      <ResetPasswordForm account={account} locale={locale} onCredential={handleCredential} resetAction={resetAction} />
                     </td>
                   </tr>
                 ))}
@@ -210,7 +224,9 @@ export function AccountManagement({ accounts, createAction, resetAction }: Accou
             </table>
           </div>
         ) : (
-          <EmptyState title="No participant accounts yet">Create the first participant account to start uploading outcomes.</EmptyState>
+          <EmptyState title={translate(locale, "admin.noParticipantAccounts")}>
+            {translate(locale, "admin.noParticipantAccountsBody")}
+          </EmptyState>
         )}
       </section>
     </div>

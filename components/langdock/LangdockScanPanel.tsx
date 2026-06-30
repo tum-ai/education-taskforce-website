@@ -3,16 +3,18 @@
 import { useState } from "react";
 import { Check, Copy, ExternalLink } from "lucide-react";
 import type { LangdockCredential } from "@/lib/domain/langdock";
+import { translate, type Locale } from "@/lib/i18n/translations";
 import { Button } from "@/components/ui/Button";
 import styles from "./LangdockScanPanel.module.css";
 
 type LangdockScanPanelProps = {
   credential: LangdockCredential;
+  locale: Locale;
 };
 
 type CopyKey = "email" | "password" | null;
 
-export function LangdockScanPanel({ credential }: LangdockScanPanelProps) {
+export function LangdockScanPanel({ credential, locale }: LangdockScanPanelProps) {
   const [copied, setCopied] = useState<CopyKey>(null);
   const meta = [credential.group, credential.device].filter(Boolean).join(" / ");
 
@@ -25,20 +27,22 @@ export function LangdockScanPanel({ credential }: LangdockScanPanelProps) {
   return (
     <div className={styles.panel}>
       <div className={styles.header}>
-        <p>{meta || "Assigned Langdock login"}</p>
+        <p>{meta || translate(locale, "langdock.assignedLogin")}</p>
         <h1 id="langdock-scan-title">{credential.label}</h1>
       </div>
 
       <div className={styles.credentials}>
         <CredentialRow
           copied={copied === "email"}
-          label="Email"
+          label={translate(locale, "langdock.email")}
+          locale={locale}
           onCopy={() => copyValue("email", credential.email)}
           value={credential.email}
         />
         <CredentialRow
           copied={copied === "password"}
-          label="Password"
+          label={translate(locale, "langdock.password")}
+          locale={locale}
           onCopy={() => copyValue("password", credential.password)}
           value={credential.password}
         />
@@ -46,7 +50,7 @@ export function LangdockScanPanel({ credential }: LangdockScanPanelProps) {
 
       <a className={styles.openLink} href={credential.loginUrl} target="_blank" rel="noreferrer">
         <ExternalLink aria-hidden="true" size={18} />
-        <span>Open Langdock</span>
+        <span>{translate(locale, "langdock.open")}</span>
       </a>
     </div>
   );
@@ -55,11 +59,13 @@ export function LangdockScanPanel({ credential }: LangdockScanPanelProps) {
 function CredentialRow({
   copied,
   label,
+  locale,
   onCopy,
   value,
 }: {
   copied: boolean;
   label: string;
+  locale: Locale;
   onCopy: () => void;
   value: string;
 }) {
@@ -74,7 +80,7 @@ function CredentialRow({
         type="button"
         variant="secondary"
       >
-        {copied ? "Copied" : "Copy"}
+        {copied ? translate(locale, "admin.copied") : translate(locale, "admin.copy")}
       </Button>
     </div>
   );

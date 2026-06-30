@@ -3,35 +3,39 @@ import { DayCard } from "@/components/portal/DayCard";
 import { createDayBuckets } from "@/lib/domain/days";
 import { requireParticipant } from "@/lib/auth/current-account";
 import { listUploadsForAccount } from "@/lib/data/uploads";
+import { getRequestLocale } from "@/lib/i18n/server";
+import { translate } from "@/lib/i18n/translations";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 
 export default async function PortalPage() {
+  const locale = await getRequestLocale();
   const account = await requireParticipant();
   const uploads = await listUploadsForAccount(account.id);
-  const buckets = createDayBuckets(uploads);
+  const buckets = createDayBuckets(uploads, locale);
 
   return (
     <>
-      <AppHeader account={account} />
+      <AppHeader account={account} locale={locale} />
       <main className={styles.page}>
         <section className="container" aria-labelledby="portal-title">
           <div className={styles.header}>
-            <span>Your course archive</span>
-            <h1 id="portal-title">Five days from AI Edutainment.</h1>
-            <p>Open a day to see the images, pages, documents, and projects saved for your account.</p>
+            <span>{translate(locale, "portal.kicker")}</span>
+            <h1 id="portal-title">{translate(locale, "portal.title")}</h1>
+            <p>{translate(locale, "portal.body")}</p>
           </div>
           <div className={styles.grid}>
             {buckets.map((bucket) => (
-              <DayCard bucket={bucket} key={bucket.dayNumber} />
+              <DayCard bucket={bucket} key={bucket.dayNumber} locale={locale} />
             ))}
             <DayCard
               href="/"
-              kicker="TUM.ai"
-              title="Who we are"
-              description="We are a student initiative from the Technical University of Munich helping young people explore AI through hands-on projects, creativity, and responsible technology."
-              meta="Back to landing page"
+              kicker={translate(locale, "portal.whoKicker")}
+              title={translate(locale, "portal.whoTitle")}
+              description={translate(locale, "portal.whoDescription")}
+              meta={translate(locale, "portal.whoMeta")}
+              locale={locale}
             />
           </div>
         </section>

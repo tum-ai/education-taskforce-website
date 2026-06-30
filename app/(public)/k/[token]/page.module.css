@@ -23,6 +23,10 @@
   font-weight: 900;
 }
 
+.language {
+  justify-self: start;
+}
+
 .brand span {
   border-radius: var(--radius-sm);
   background: var(--color-indigo-950);

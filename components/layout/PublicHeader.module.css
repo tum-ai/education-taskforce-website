@@ -63,6 +63,14 @@
   transform: scale(1.18);
 }
 
+.header nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  color: var(--color-lavender-50);
+}
+
 .header .loginButton {
   border-color: rgb(154 100 217 / 58%);
   background: rgb(154 100 217 / 12%);

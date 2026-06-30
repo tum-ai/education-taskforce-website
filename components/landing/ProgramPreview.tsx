@@ -1,7 +1,8 @@
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { PROGRAM_DAYS } from "@/lib/domain/days";
+import { getProgramDays } from "@/lib/domain/days";
+import { translate, type Locale } from "@/lib/i18n/translations";
 import styles from "./ProgramPreview.module.css";
 
 const journeyImages = [
@@ -27,20 +28,23 @@ const journeyImages = [
   },
 ];
 
-export function ProgramPreview() {
+type ProgramPreviewProps = {
+  locale: Locale;
+};
+
+export function ProgramPreview({ locale }: ProgramPreviewProps) {
+  const days = getProgramDays(locale);
+
   return (
     <section className={styles.section} id="program">
       <div className="container">
         <div className={styles.header}>
-          <span>Program</span>
-          <h2>A five-day AI journey for kids and teens.</h2>
-          <p>
-            Built for ages 12-18, the course moves from first experiments to a final project. Each step adds
-            outcomes to the private portal, so students can revisit and download what they made.
-          </p>
+          <span>{translate(locale, "landing.program.kicker")}</span>
+          <h2>{translate(locale, "landing.program.title")}</h2>
+          <p>{translate(locale, "landing.program.body")}</p>
         </div>
-        <div className={styles.timeline} aria-label="Five day AI journey">
-          {PROGRAM_DAYS.map((day, index) => (
+        <div className={styles.timeline} aria-label={translate(locale, "landing.program.timeline")}>
+          {days.map((day, index) => (
             <article className={styles.timelineItem} key={day.dayNumber}>
               <div className={styles.media}>
                 <Image
@@ -55,7 +59,7 @@ export function ProgramPreview() {
                 <span>{day.dayNumber}</span>
               </div>
               <div className={styles.content}>
-                <div className={styles.number}>Day {day.dayNumber}</div>
+                <div className={styles.number}>{translate(locale, "portal.day", { dayNumber: day.dayNumber })}</div>
                 <h3>{day.title}</h3>
                 <p>{day.description}</p>
               </div>
@@ -63,7 +67,7 @@ export function ProgramPreview() {
           ))}
         </div>
         <Link className={styles.portalLink} href="/login">
-          Open the private portal
+          {translate(locale, "landing.program.portal")}
           <ArrowRight aria-hidden="true" size={18} />
         </Link>
       </div>

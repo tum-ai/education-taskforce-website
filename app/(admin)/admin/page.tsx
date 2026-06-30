@@ -5,11 +5,14 @@ import { requireAdmin } from "@/lib/auth/current-account";
 import { listParticipantAccounts } from "@/lib/data/accounts";
 import { listRecentUploads } from "@/lib/data/uploads";
 import { DAY_NUMBERS } from "@/lib/domain/types";
+import { getRequestLocale } from "@/lib/i18n/server";
+import { translate } from "@/lib/i18n/translations";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
+  const locale = await getRequestLocale();
   const account = await requireAdmin();
   const [participants, uploads] = await Promise.all([listParticipantAccounts(), listRecentUploads(12)]);
   const filledBuckets = new Set(uploads.map((upload) => `${upload.accountId}:${upload.dayNumber}`));
@@ -17,40 +20,40 @@ export default async function AdminPage() {
 
   return (
     <>
-      <AppHeader account={account} />
+      <AppHeader account={account} locale={locale} />
       <main className={styles.page}>
         <section className="container" aria-labelledby="admin-title">
           <div className={styles.header}>
-            <span>Admin</span>
-            <h1 id="admin-title">Course operations.</h1>
-            <p>Create participant accounts, prepare QR credentials, and add daily outcomes.</p>
+            <span>{translate(locale, "admin.kicker")}</span>
+            <h1 id="admin-title">{translate(locale, "admin.title")}</h1>
+            <p>{translate(locale, "admin.body")}</p>
           </div>
-          <div className={styles.stats} aria-label="Admin summary">
+          <div className={styles.stats} aria-label={translate(locale, "admin.summary")}>
             <article>
               <UsersRound aria-hidden="true" size={22} />
               <strong>{participants.length}</strong>
-              <span>participant accounts</span>
+              <span>{translate(locale, "admin.participantAccounts")}</span>
             </article>
             <article>
               <FileUp aria-hidden="true" size={22} />
               <strong>{uploads.length}</strong>
-              <span>recent uploads</span>
+              <span>{translate(locale, "admin.recentUploads")}</span>
             </article>
             <article>
               <FileUp aria-hidden="true" size={22} />
               <strong>{Math.max(emptyBucketCount, 0)}</strong>
-              <span>empty day buckets</span>
+              <span>{translate(locale, "admin.emptyDayBuckets")}</span>
             </article>
           </div>
           <div className={styles.actions}>
             <LinkButton href="/admin/accounts" icon={<UserRoundPlus aria-hidden="true" size={18} />}>
-              Manage accounts
+              {translate(locale, "admin.manageAccounts")}
             </LinkButton>
             <LinkButton href="/admin/uploads" icon={<FileUp aria-hidden="true" size={18} />} variant="secondary">
-              Upload outcomes
+              {translate(locale, "admin.uploadOutcomes")}
             </LinkButton>
             <LinkButton href="/admin/langdock" icon={<QrCode aria-hidden="true" size={18} />} variant="secondary">
-              Langdock QR
+              {translate(locale, "nav.langdockQr")}
             </LinkButton>
           </div>
         </section>
