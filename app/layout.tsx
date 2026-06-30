@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import { GlobalBackButton } from "@/components/layout/GlobalBackButton";
 import { getRequestLocale } from "@/lib/i18n/server";
 import "@/styles/globals.css";
+
+const manrope = localFont({
+  display: "swap",
+  src: "../public/brand-assets/Manrope/Manrope-VariableFont_wght.ttf",
+  variable: "--font-manrope",
+  weight: "200 900",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -19,7 +27,7 @@ export default async function RootLayout({
   const locale = await getRequestLocale();
 
   return (
-    <html lang={locale}>
+    <html className={manrope.variable} lang={locale}>
       <body>
         <GlobalBackButton locale={locale} />
         {children}
