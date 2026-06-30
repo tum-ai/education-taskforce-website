@@ -1,0 +1,61 @@
+.backButton {
+  position: fixed;
+  top: 84px;
+  right: max(16px, calc((100vw - var(--container)) / 2));
+  z-index: 24;
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgb(82 53 115 / 12%);
+  border-radius: var(--radius-md);
+  background: rgb(255 255 255 / 72%);
+  color: rgb(82 53 115 / 74%);
+  padding: 0 10px;
+  font-size: 0.88rem;
+  font-weight: 750;
+  line-height: 1;
+  box-shadow: 0 8px 22px rgb(27 0 73 / 7%);
+  backdrop-filter: blur(14px);
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.backButton:hover {
+  transform: translateY(-1px);
+  border-color: rgb(154 100 217 / 30%);
+  background: rgb(255 255 255 / 92%);
+  color: var(--color-indigo-950);
+  box-shadow: 0 12px 28px rgb(27 0 73 / 10%);
+}
+
+.backButton:active {
+  transform: translateY(0);
+}
+
+.backButton svg {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 760px) {
+  .backButton {
+    top: 76px;
+    right: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .backButton span {
+    display: none;
+  }
+
+  .backButton {
+    width: 36px;
+    justify-content: center;
+    padding: 0;
+  }
+}

@@ -43,6 +43,20 @@ body {
     var(--color-white);
 }
 
+.site-shell {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100svh;
+  flex-direction: column;
+}
+
+.site-content {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  min-height: calc(100svh + 320px);
+}
+
 body,
 button,
 input,

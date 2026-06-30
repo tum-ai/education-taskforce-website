@@ -1,0 +1,137 @@
+.footer {
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid rgb(255 255 255 / 1%);
+  background-color: #0d0214;
+  background-image: linear-gradient(135deg, #0d0214 0%, var(--color-purple-700) 100%);
+}
+
+.gridOverlay {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 2%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 2%) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(white, transparent 85%);
+}
+
+.section {
+  position: relative;
+}
+
+.container {
+  width: min(var(--container), calc(100% - 64px));
+  margin: 0 auto;
+  padding: 32px 0;
+}
+
+.top {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.logo {
+  display: flex;
+  width: 128px;
+  height: 32px;
+  margin-left: 4px;
+  transition: opacity 300ms ease;
+}
+
+.logo:hover {
+  opacity: 0.9;
+}
+
+.linksGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.column {
+  min-width: 0;
+}
+
+.heading {
+  margin: 0 0 12px;
+  color: rgb(255 255 255 / 50%);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  color: rgb(255 255 255 / 80%);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  transition: color 300ms ease;
+}
+
+.link:hover {
+  color: var(--color-lavender-500);
+}
+
+.bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 48px;
+  border-top: 1px solid rgb(255 255 255 / 10%);
+  padding-top: 32px;
+}
+
+.bottom p {
+  margin: 0;
+  color: rgb(255 255 255 / 40%);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+@media (min-width: 640px) {
+  .top {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .linksGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 48px;
+  }
+
+  .bottom {
+    flex-direction: row;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    width: min(var(--container), calc(100% - 80px));
+  }
+
+  .linksGrid {
+    column-gap: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    width: min(var(--container), calc(100% - 32px));
+  }
+
+  .linksGrid {
+    grid-template-columns: 1fr;
+  }
+}

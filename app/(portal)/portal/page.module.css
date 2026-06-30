@@ -1,5 +1,6 @@
 .page {
-  padding: 46px 0 72px;
+  min-height: calc(100svh + 340px);
+  padding: 58px 0 120px;
 }
 
 .header {
@@ -33,17 +34,16 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
-}
-
-@media (max-width: 1120px) {
-  .grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
 }
 
 @media (max-width: 760px) {
+  .page {
+    min-height: calc(100svh + 260px);
+    padding: 42px 0 92px;
+  }
+
   .grid {
     grid-template-columns: 1fr;
   }

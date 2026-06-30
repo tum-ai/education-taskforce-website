@@ -26,6 +26,13 @@ export default async function PortalPage() {
             {buckets.map((bucket) => (
               <DayCard bucket={bucket} key={bucket.dayNumber} />
             ))}
+            <DayCard
+              href="/"
+              kicker="TUM.ai"
+              title="Who we are"
+              description="We are a student initiative from the Technical University of Munich helping young people explore AI through hands-on projects, creativity, and responsible technology."
+              meta="Back to landing page"
+            />
           </div>
         </section>
       </main>
