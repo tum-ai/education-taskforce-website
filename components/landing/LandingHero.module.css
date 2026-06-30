@@ -124,7 +124,10 @@
   }
 
   .heroStack h1 {
-    font-size: clamp(3rem, 18vw, 5.5rem);
+    max-width: calc(100% - 24px);
+    font-size: clamp(2.35rem, 13.2vw, 4rem);
+    line-height: 0.9;
+    text-wrap: balance;
     white-space: normal;
   }
 

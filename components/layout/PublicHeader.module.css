@@ -8,6 +8,7 @@
 }
 
 .inner {
+  position: relative;
   display: flex;
   min-height: 68px;
   align-items: center;
@@ -19,18 +20,47 @@
   display: inline-flex;
   min-width: 0;
   align-items: center;
-  gap: 10px;
   color: var(--color-white);
   font-weight: 800;
   letter-spacing: 0;
 }
 
-.mark {
+.tumaiLogo {
+  width: clamp(104px, 13vw, 138px);
+  height: auto;
+  flex: 0 0 auto;
+}
+
+.centerLogo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  overflow: hidden;
   border-radius: var(--radius-sm);
-  background: var(--color-lavender-500);
-  color: #050506;
-  padding: 7px 9px;
-  font-size: 0.88rem;
+  transform: translate(-50%, -50%);
+  transition:
+    opacity 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.centerLogo:hover {
+  opacity: 0.82;
+}
+
+.centerLogo:focus-visible {
+  outline: 3px solid rgb(154 100 217 / 58%);
+  outline-offset: 4px;
+}
+
+.centerLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: scale(1.18);
 }
 
 .header .loginButton {
@@ -46,8 +76,13 @@
   color: var(--color-white);
 }
 
-@media (max-width: 520px) {
-  .brand span:last-child {
-    display: none;
+@media (max-width: 620px) {
+  .tumaiLogo {
+    width: 118px;
+  }
+
+  .centerLogo {
+    width: 44px;
+    height: 44px;
   }
 }
