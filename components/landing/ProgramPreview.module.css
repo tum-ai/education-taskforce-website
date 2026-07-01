@@ -25,6 +25,7 @@
   font-size: clamp(2rem, 5vw, 4.2rem);
   letter-spacing: 0;
   line-height: 1.02;
+  white-space: pre-line;
 }
 
 .header p {

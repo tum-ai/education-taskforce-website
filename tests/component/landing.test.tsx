@@ -7,7 +7,7 @@ describe("ProgramPreview", () => {
   it("renders exactly five day previews", () => {
     render(<ProgramPreview locale="en" />);
 
-    expect(screen.getByRole("heading", { name: /ages 8-18/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /AI journey\s+for all ages/i })).toBeInTheDocument();
     expect(screen.getAllByText(/^Day \d$/)).toHaveLength(5);
   });
 });
