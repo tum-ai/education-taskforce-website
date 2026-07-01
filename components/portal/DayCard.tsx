@@ -38,6 +38,7 @@ type DayCardProps =
 export function DayCard(props: DayCardProps) {
   const isDayCard = Boolean(props.bucket);
   const href = props.bucket ? `/portal/day/${props.bucket.dayNumber}` : props.href;
+  const isExternal = href.startsWith("http");
   const kicker = props.bucket ? translate(props.locale, "portal.day", { dayNumber: props.bucket.dayNumber }) : props.kicker;
   const title = props.bucket ? props.bucket.title : props.title;
   const description = props.bucket ? props.bucket.description : props.description;
@@ -51,7 +52,12 @@ export function DayCard(props: DayCardProps) {
   const actionLabel = isDayCard ? translate(props.locale, "portal.viewOutcomes") : translate(props.locale, "portal.learnMore");
 
   return (
-    <Link className={`${styles.card} ${isDayCard ? "" : styles.brandCard}`} href={href}>
+    <Link
+      className={`${styles.card} ${isDayCard ? "" : styles.brandCard}`}
+      href={href}
+      rel={isExternal ? "noopener noreferrer" : undefined}
+      target={isExternal ? "_blank" : undefined}
+    >
       <div className={styles.media}>
         <Image
           alt=""

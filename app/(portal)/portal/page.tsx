@@ -30,7 +30,7 @@ export default async function PortalPage() {
               <DayCard bucket={bucket} key={bucket.dayNumber} locale={locale} />
             ))}
             <DayCard
-              href="/"
+              href="https://www.tum-ai.com/"
               kicker={translate(locale, "portal.whoKicker")}
               title={translate(locale, "portal.whoTitle")}
               description={translate(locale, "portal.whoDescription")}
