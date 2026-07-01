@@ -3,8 +3,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { Check, Copy, Printer, Upload } from "lucide-react";
-import type { LangdockImportActionState } from "@/app/(admin)/admin/langdock/actions";
-import { DEFAULT_LANGDOCK_LOGIN_URL, type LangdockCredentialCard } from "@/lib/domain/langdock";
+import { DEFAULT_LANGDOCK_LOGIN_URL, type LangdockCredentialCard, type LangdockImportError } from "@/lib/domain/langdock";
 import { LOCALE_COOKIE, translate, type Locale } from "@/lib/i18n/translations";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -12,34 +11,67 @@ import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { TextInput } from "@/components/ui/TextInput";
 import styles from "./LangdockCredentialManagement.module.css";
 
-type LangdockCredentialManagementProps = {
-  credentials: LangdockCredentialCard[];
-  detectedOrigin: string;
-  importAction: (
-    previousState: LangdockImportActionState,
-    formData: FormData,
-  ) => Promise<LangdockImportActionState>;
-  locale: Locale;
-  loadError?: string;
+export type CredentialImportActionState = {
+  status: "idle" | "success" | "error";
+  message?: string;
+  errors?: LangdockImportError[];
+  credentials?: LangdockCredentialCard[];
 };
 
-const initialState: LangdockImportActionState = {
+type LangdockCredentialManagementProps = {
+  credentials: LangdockCredentialCard[];
+  defaultLoginUrl?: string;
+  detectedOrigin: string;
+  importAction: (
+    previousState: CredentialImportActionState,
+    formData: FormData,
+  ) => Promise<CredentialImportActionState>;
+  labels?: {
+    cardAltPrefix: string;
+    defaultLoginUrl: string;
+    importBody: string;
+    importTitle: string;
+    loginFallback: string;
+    noCardsBody: string;
+    noCardsTitle: string;
+  };
+  locale: Locale;
+  loadError?: string;
+  sampleCsv?: string;
+  textareaId?: string;
+};
+
+const initialState: CredentialImportActionState = {
   status: "idle",
 };
 
-const sampleCsv = `label,email,password,group,device
+const defaultSampleCsv = `label,email,password,group,device
 Ada,ada@example.com,example-password,Blue,iPad 1
 Ben,ben@example.com,example-password,Blue,iPad 2`;
 
 export function LangdockCredentialManagement({
   credentials,
+  defaultLoginUrl = DEFAULT_LANGDOCK_LOGIN_URL,
   detectedOrigin,
   importAction,
+  labels,
   locale,
   loadError,
+  sampleCsv = defaultSampleCsv,
+  textareaId = "langdock-csv",
 }: LangdockCredentialManagementProps) {
   const [state, formAction, isPending] = useActionState(importAction, initialState);
   const [cards, setCards] = useState(credentials);
+  const resolvedLabels = {
+    cardAltPrefix: "Langdock QR code for",
+    defaultLoginUrl: translate(locale, "admin.defaultLangdockUrl"),
+    importBody: translate(locale, "admin.importLangdockBody"),
+    importTitle: translate(locale, "admin.importLangdock"),
+    loginFallback: translate(locale, "admin.langdockLogin"),
+    noCardsBody: translate(locale, "admin.noLangdockCardsBody"),
+    noCardsTitle: translate(locale, "admin.noLangdockCards"),
+    ...labels,
+  };
 
   useEffect(() => {
     setCards(credentials);
@@ -57,8 +89,8 @@ export function LangdockCredentialManagement({
         <div className={styles.panelHeader}>
           <Upload aria-hidden="true" size={20} />
           <div>
-            <h2 id="import-title">{translate(locale, "admin.importLangdock")}</h2>
-            <p>{translate(locale, "admin.importLangdockBody")}</p>
+            <h2 id="import-title">{resolvedLabels.importTitle}</h2>
+            <p>{resolvedLabels.importBody}</p>
           </div>
         </div>
         <form action={formAction} className={styles.form}>
@@ -89,15 +121,15 @@ export function LangdockCredentialManagement({
             value={detectedOrigin}
           />
           <TextInput
-            defaultValue={DEFAULT_LANGDOCK_LOGIN_URL}
-            label={translate(locale, "admin.defaultLangdockUrl")}
+            defaultValue={defaultLoginUrl}
+            label={resolvedLabels.defaultLoginUrl}
             name="defaultLoginUrl"
             required
             type="url"
           />
-          <label className={styles.field} htmlFor="langdock-csv">
+          <label className={styles.field} htmlFor={textareaId}>
             <span>{translate(locale, "admin.csvAccounts")}</span>
-            <textarea id="langdock-csv" name="csv" required spellCheck={false} defaultValue={sampleCsv} />
+            <textarea id={textareaId} name="csv" required spellCheck={false} defaultValue={sampleCsv} />
           </label>
           <div className={styles.actions}>
             <Button disabled={isPending} icon={<Upload aria-hidden="true" size={18} />} type="submit">
@@ -131,20 +163,34 @@ export function LangdockCredentialManagement({
         {cards.length > 0 ? (
           <div className={styles.grid}>
             {cards.map((credential) => (
-              <LangdockQrCard key={credential.id} credential={credential} locale={locale} />
+              <LangdockQrCard
+                altPrefix={resolvedLabels.cardAltPrefix}
+                key={credential.id}
+                credential={credential}
+                locale={locale}
+                loginFallback={resolvedLabels.loginFallback}
+              />
             ))}
           </div>
         ) : (
-          <EmptyState title={translate(locale, "admin.noLangdockCards")}>
-            {translate(locale, "admin.noLangdockCardsBody")}
-          </EmptyState>
+          <EmptyState title={resolvedLabels.noCardsTitle}>{resolvedLabels.noCardsBody}</EmptyState>
         )}
       </section>
     </div>
   );
 }
 
-function LangdockQrCard({ credential, locale }: { credential: LangdockCredentialCard; locale: Locale }) {
+function LangdockQrCard({
+  altPrefix,
+  credential,
+  locale,
+  loginFallback,
+}: {
+  altPrefix: string;
+  credential: LangdockCredentialCard;
+  locale: Locale;
+  loginFallback: string;
+}) {
   const [copied, setCopied] = useState(false);
   const meta = [credential.group, credential.device].filter(Boolean).join(" / ");
 
@@ -157,11 +203,11 @@ function LangdockQrCard({ credential, locale }: { credential: LangdockCredential
   return (
     <article className={styles.card}>
       <div className={styles.qrImage}>
-        <img alt={`Langdock QR code for ${credential.label}`} height={220} src={credential.qrDataUrl} width={220} />
+        <img alt={`${altPrefix} ${credential.label}`} height={220} src={credential.qrDataUrl} width={220} />
       </div>
       <div className={styles.cardBody}>
         <h3>{credential.label}</h3>
-        {meta ? <p>{meta}</p> : <p>{translate(locale, "admin.langdockLogin")}</p>}
+        {meta ? <p>{meta}</p> : <p>{loginFallback}</p>}
         <code>{credential.email}</code>
         <span>{translate(locale, "admin.passwordAvailableAfterScan")}</span>
       </div>

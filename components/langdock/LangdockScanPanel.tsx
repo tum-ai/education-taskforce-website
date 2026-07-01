@@ -10,13 +10,26 @@ import styles from "./LangdockScanPanel.module.css";
 type LangdockScanPanelProps = {
   credential: LangdockCredential;
   locale: Locale;
+  labels?: {
+    assignedLogin: string;
+    email: string;
+    open: string;
+    password: string;
+  };
 };
 
 type CopyKey = "email" | "password" | null;
 
-export function LangdockScanPanel({ credential, locale }: LangdockScanPanelProps) {
+export function LangdockScanPanel({ credential, labels, locale }: LangdockScanPanelProps) {
   const [copied, setCopied] = useState<CopyKey>(null);
   const meta = [credential.group, credential.device].filter(Boolean).join(" / ");
+  const resolvedLabels = {
+    assignedLogin: translate(locale, "langdock.assignedLogin"),
+    email: translate(locale, "langdock.email"),
+    open: translate(locale, "langdock.open"),
+    password: translate(locale, "langdock.password"),
+    ...labels,
+  };
 
   async function copyValue(key: Exclude<CopyKey, null>, value: string) {
     await navigator.clipboard.writeText(value);
@@ -27,21 +40,21 @@ export function LangdockScanPanel({ credential, locale }: LangdockScanPanelProps
   return (
     <div className={styles.panel}>
       <div className={styles.header}>
-        <p>{meta || translate(locale, "langdock.assignedLogin")}</p>
+        <p>{meta || resolvedLabels.assignedLogin}</p>
         <h1 id="langdock-scan-title">{credential.label}</h1>
       </div>
 
       <div className={styles.credentials}>
         <CredentialRow
           copied={copied === "email"}
-          label={translate(locale, "langdock.email")}
+          label={resolvedLabels.email}
           locale={locale}
           onCopy={() => copyValue("email", credential.email)}
           value={credential.email}
         />
         <CredentialRow
           copied={copied === "password"}
-          label={translate(locale, "langdock.password")}
+          label={resolvedLabels.password}
           locale={locale}
           onCopy={() => copyValue("password", credential.password)}
           value={credential.password}
@@ -50,7 +63,7 @@ export function LangdockScanPanel({ credential, locale }: LangdockScanPanelProps
 
       <a className={styles.openLink} href={credential.loginUrl} target="_blank" rel="noreferrer">
         <ExternalLink aria-hidden="true" size={18} />
-        <span>{translate(locale, "langdock.open")}</span>
+        <span>{resolvedLabels.open}</span>
       </a>
     </div>
   );

@@ -2,34 +2,34 @@
 
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth/current-account";
+import { importLovableCredentialsFromCsv } from "@/lib/data/lovable-credentials";
 import {
-  type LangdockCredentialCard,
-  type LangdockImportError,
-  DEFAULT_LANGDOCK_LOGIN_URL,
-} from "@/lib/domain/langdock";
-import { importLangdockCredentialsFromCsv } from "@/lib/data/langdock-credentials";
+  DEFAULT_LOVABLE_LOGIN_URL,
+  type LovableCredentialCard,
+  type LovableImportError,
+} from "@/lib/domain/lovable";
 import { LOCALE_COOKIE, normalizeLocale, translate } from "@/lib/i18n/translations";
 import { getCurrentRequestOrigin } from "@/lib/qr/origin";
 
-export type LangdockImportActionState = {
+export type LovableImportActionState = {
   status: "idle" | "success" | "error";
   message?: string;
-  errors?: LangdockImportError[];
-  credentials?: LangdockCredentialCard[];
+  errors?: LovableImportError[];
+  credentials?: LovableCredentialCard[];
 };
 
-export async function importLangdockCredentialsFormAction(
-  _previousState: LangdockImportActionState,
+export async function importLovableCredentialsFormAction(
+  _previousState: LovableImportActionState,
   formData: FormData,
-): Promise<LangdockImportActionState> {
+): Promise<LovableImportActionState> {
   await requireAdmin();
   const locale = normalizeLocale(formData.get(LOCALE_COOKIE));
 
   const csv = String(formData.get("csv") ?? "");
-  const defaultLoginUrl = String(formData.get("defaultLoginUrl") ?? DEFAULT_LANGDOCK_LOGIN_URL);
+  const defaultLoginUrl = String(formData.get("defaultLoginUrl") ?? DEFAULT_LOVABLE_LOGIN_URL);
 
   try {
-    const result = await importLangdockCredentialsFromCsv(csv, {
+    const result = await importLovableCredentialsFromCsv(csv, {
       defaultLoginUrl,
       siteOrigin: await getCurrentRequestOrigin(),
     });
@@ -42,21 +42,20 @@ export async function importLangdockCredentialsFormAction(
       };
     }
 
-    revalidatePath("/admin/langdock");
-    revalidatePath("/admin/qr/langdock");
+    revalidatePath("/admin/qr/lovable");
 
     return {
       status: "success",
       message:
         result.importedCount === 1
-          ? translate(locale, "admin.importedLangdockOne")
-          : translate(locale, "admin.importedLangdockMany", { count: result.importedCount }),
+          ? translate(locale, "admin.importedLovableOne")
+          : translate(locale, "admin.importedLovableMany", { count: result.importedCount }),
       credentials: result.credentials,
     };
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : translate(locale, "admin.couldNotImportLangdock"),
+      message: error instanceof Error ? error.message : translate(locale, "admin.couldNotImportLovable"),
     };
   }
 }

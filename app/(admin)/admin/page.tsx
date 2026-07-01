@@ -52,8 +52,8 @@ export default async function AdminPage() {
             <LinkButton href="/admin/uploads" icon={<FileUp aria-hidden="true" size={18} />} variant="secondary">
               {translate(locale, "admin.uploadOutcomes")}
             </LinkButton>
-            <LinkButton href="/admin/langdock" icon={<QrCode aria-hidden="true" size={18} />} variant="secondary">
-              {translate(locale, "nav.langdockQr")}
+            <LinkButton href="/admin/qr" icon={<QrCode aria-hidden="true" size={18} />} variant="secondary">
+              {translate(locale, "nav.qrCodes")}
             </LinkButton>
           </div>
         </section>
