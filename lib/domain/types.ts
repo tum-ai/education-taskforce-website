@@ -33,5 +33,6 @@ export type DayBucket = {
   dayNumber: DayNumber;
   title: string;
   description: string;
+  shortDescription?: string;
   uploads: DayUpload[];
 };

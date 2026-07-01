@@ -7,8 +7,8 @@
   border-radius: var(--radius-md);
   background: var(--color-white);
   box-shadow:
-    0 2px 8px rgb(27 0 73 / 8%),
-    0 18px 44px rgb(27 0 73 / 14%);
+    0 3px 10px rgb(27 0 73 / 9%),
+    0 22px 52px rgb(27 0 73 / 15%);
   transition:
     transform 160ms ease,
     box-shadow 160ms ease,
@@ -69,8 +69,8 @@
   display: grid;
   min-height: 0;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  gap: 10px;
-  padding: clamp(18px, 2.8vw, 26px);
+  gap: 11px;
+  padding: clamp(24px, 3.2vw, 32px) clamp(18px, 2.8vw, 26px) clamp(18px, 2.8vw, 26px);
 }
 
 .card h2 {
@@ -163,7 +163,7 @@
 @media (max-width: 880px) {
   .content {
     gap: 8px;
-    padding: 18px;
+    padding: 22px 18px 18px;
   }
 
   .footer {

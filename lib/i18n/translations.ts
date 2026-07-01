@@ -33,9 +33,9 @@ const translations = {
     "footer.disclaimer": "Disclaimer",
     "footer.bottom": "TUM.ai - Student Initiative at Technical University of Munich",
     "landing.program.kicker": "Program",
-    "landing.program.title": "A five-day AI journey for kids and teens.",
+    "landing.program.title": "A five-day AI journey for ages 8-18.",
     "landing.program.body":
-      "Built for ages 12-18, the course moves from first experiments to a final project. Each step adds outcomes to the private portal, so students can revisit and download what they made.",
+      "Built for ages 8-18, the course is modular and adapts to the speed, curiosity, and eagerness each child brings. Nobody gets left behind, faster students can keep exploring, and fun stays the most important part. Each step adds outcomes to the private portal, so students can revisit and download what they made.",
     "landing.program.timeline": "Five day AI journey",
     "landing.program.portal": "Open the private portal",
     "login.kicker": "Private portal",
@@ -55,7 +55,7 @@ const translations = {
     "portal.whoKicker": "TUM.ai",
     "portal.whoTitle": "Who we are",
     "portal.whoDescription":
-      "We are a student initiative from the Technical University of Munich helping young people explore AI through hands-on projects, creativity, and responsible technology.",
+      "We are Europe's leading AI student initiative from the Technical University of Munich helping young people explore AI through hands-on projects, creativity, and responsible technology. If you have any further questions about our education/research feel always free to contact us right away.",
     "portal.whoMeta": "Official TUM.ai website",
     "portal.viewOutcomes": "View outcomes",
     "portal.learnMore": "Learn more",
@@ -198,9 +198,9 @@ const translations = {
     "footer.disclaimer": "Haftungsausschluss",
     "footer.bottom": "TUM.ai - Studierendeninitiative der Technischen Universität München",
     "landing.program.kicker": "Programm",
-    "landing.program.title": "Eine fünftägige KI-Reise für Kinder und Jugendliche.",
+    "landing.program.title": "Fünf Tage KI-Reise für 8- bis 18-Jährige.",
     "landing.program.body":
-      "Für 12- bis 18-Jährige entwickelt: Der Kurs führt von ersten Experimenten bis zu einem finalen Projekt. Jeder Schritt ergänzt Ergebnisse im privaten Portal, damit die Teilnehmenden ihre Arbeiten erneut ansehen und herunterladen können.",
+      "Für 8- bis 18-Jährige entwickelt: Der Kurs ist modular und passt sich an Tempo, Neugier und Motivation jedes Kindes an. Niemand wird zurückgelassen, schnelle Teilnehmende können weiterforschen, und Spaß bleibt der wichtigste Teil. Jeder Schritt ergänzt Ergebnisse im privaten Portal, damit die Teilnehmenden ihre Arbeiten erneut ansehen und herunterladen können.",
     "landing.program.timeline": "Fünftägige KI-Reise",
     "landing.program.portal": "Privates Portal öffnen",
     "login.kicker": "Privates Portal",
@@ -220,7 +220,7 @@ const translations = {
     "portal.whoKicker": "TUM.ai",
     "portal.whoTitle": "Wer wir sind",
     "portal.whoDescription":
-      "Wir sind eine Studierendeninitiative der Technischen Universität München und helfen jungen Menschen, KI durch eigene Projekte, Kreativität und verantwortungsvolle Technologie zu entdecken.",
+      "Wir sind Europa's leitende KI-Studierendeninitiative der Technischen Universität München und helfen jungen Menschen, KI durch eigene Projekte, Kreativität und verantwortungsvolle Technologie zu entdecken. Wenn Sie weitere Fragen zu unserer Bildung/Forschung haben, können Sie uns jederzeit umgehend kontaktieren.",
     "portal.whoMeta": "Offizielle TUM.ai Website",
     "portal.viewOutcomes": "Ergebnisse ansehen",
     "portal.learnMore": "Mehr erfahren",

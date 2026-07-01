@@ -6,11 +6,11 @@ import { translate, type Locale } from "@/lib/i18n/translations";
 import styles from "./DayCard.module.css";
 
 const dayImages = {
-  1: "/program/day-1-discover-ai.png",
-  2: "/program/day-2-prompt-lab.png",
-  3: "/program/day-3-visual-stories.png",
-  4: "/program/day-4-web-project.png",
-  5: "/program/day-5-showcase.png",
+  1: { objectPosition: "56% 50%", src: "/program/AI-picure.jpg" },
+  2: { objectPosition: "50% 50%", src: "/program/code-picture.jpg" },
+  3: { objectPosition: "50% 48%", src: "/program/videogame-picture.png" },
+  4: { objectPosition: "50% 50%", src: "/program/webproject-pricture.png" },
+  5: { objectPosition: "50% 46%", src: "/program/presentation-picture.png" },
 } as const;
 
 const tumaiLogoSrc = "/brand-assets/TUM.ai%20logo%20dark%20purple%20color.svg";
@@ -41,8 +41,9 @@ export function DayCard(props: DayCardProps) {
   const isExternal = href.startsWith("http");
   const kicker = props.bucket ? translate(props.locale, "portal.day", { dayNumber: props.bucket.dayNumber }) : props.kicker;
   const title = props.bucket ? props.bucket.title : props.title;
-  const description = props.bucket ? props.bucket.description : props.description;
-  const imageSrc = props.bucket ? dayImages[props.bucket.dayNumber] : tumaiLogoSrc;
+  const description = props.bucket ? (props.bucket.shortDescription ?? props.bucket.description) : props.description;
+  const image = props.bucket ? dayImages[props.bucket.dayNumber] : undefined;
+  const imageSrc = image?.src ?? tumaiLogoSrc;
   const uploadCount = props.bucket ? props.bucket.uploads.length : 0;
   const meta = props.bucket
     ? uploadCount === 1
@@ -66,6 +67,7 @@ export function DayCard(props: DayCardProps) {
           priority={props.bucket?.dayNumber === 1}
           sizes="(max-width: 760px) calc(100vw - 24px), 548px"
           src={imageSrc}
+          style={image ? { objectPosition: image.objectPosition } : undefined}
         />
         <span className={styles.kicker}>{kicker}</span>
       </div>

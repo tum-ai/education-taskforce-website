@@ -7,24 +7,34 @@ import styles from "./ProgramPreview.module.css";
 
 const journeyImages = [
   {
-    src: "/program/day-1-discover-ai.png",
-    alt: "Teens discovering AI with abstract neural patterns around a laptop",
+    src: "/program/AI-picure.jpg",
+    alt: "Large AI letters on a pink background",
+    format: "square",
+    objectPosition: "56% 50%",
   },
   {
-    src: "/program/day-2-prompt-lab.png",
-    alt: "Teens testing prompt ideas around a creative workshop table",
+    src: "/program/code-picture.jpg",
+    alt: "Close-up of code on a screen",
+    format: "square",
+    objectPosition: "50% 50%",
   },
   {
-    src: "/program/day-3-visual-stories.png",
-    alt: "Teens building visual stories with AI-generated image concepts",
+    src: "/program/videogame-picture.png",
+    alt: "Students presenting a self-built video game in a mountain workshop room",
+    format: "square",
+    objectPosition: "50% 48%",
   },
   {
-    src: "/program/day-4-web-project.png",
-    alt: "Teens creating a small web project with screens and interface components",
+    src: "/program/webproject-pricture.png",
+    alt: "Students building a web project together at a table in the mountains",
+    format: "square",
+    objectPosition: "50% 50%",
   },
   {
-    src: "/program/day-5-showcase.png",
-    alt: "Teens presenting a final AI project in a small workshop showcase",
+    src: "/program/presentation-picture.png",
+    alt: "Students presenting a game project to the group",
+    format: "square",
+    objectPosition: "50% 46%",
   },
 ];
 
@@ -46,12 +56,13 @@ export function ProgramPreview({ locale }: ProgramPreviewProps) {
         <div className={styles.timeline} aria-label={translate(locale, "landing.program.timeline")}>
           {days.map((day, index) => (
             <article className={styles.timelineItem} key={day.dayNumber}>
-              <div className={styles.media}>
+              <div className={`${styles.media} ${journeyImages[index].format === "wide" ? styles.mediaWide : ""}`}>
                 <Image
                   alt={journeyImages[index].alt}
                   height={720}
                   priority={index === 0}
                   src={journeyImages[index].src}
+                  style={{ objectPosition: journeyImages[index].objectPosition }}
                   width={1152}
                 />
               </div>
