@@ -261,7 +261,7 @@ const translations = {
     "portal.whoKicker": "TUM.ai",
     "portal.whoTitle": "Wer wir sind",
     "portal.whoDescription":
-      "Wir sind Europa's leitende KI-Studierendeninitiative der Technischen Universität München und helfen jungen Menschen, KI durch eigene Projekte, Kreativität und verantwortungsvolle Technologie zu entdecken. Wenn Sie weitere Fragen zu unserer Bildung/Forschung haben, können Sie uns jederzeit umgehend kontaktieren.",
+      "Wir sind Europa's leitende KI-Studierendeninitiative der TUM und helfen jungen Menschen, KI durch eigene Projekte, Kreativität und verantwortungsvolle Technologie zu entdecken. Wenn Sie weitere Fragen zu unserer Bildung/Forschung haben, können Sie uns jederzeit umgehend kontaktieren.",
     "portal.whoMeta": "Offizielle TUM.ai Website",
     "portal.viewOutcomes": "Ergebnisse ansehen",
     "portal.learnMore": "Mehr erfahren",
