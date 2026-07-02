@@ -1,4 +1,4 @@
-import { FileUp, QrCode, UserRoundPlus, UsersRound } from "lucide-react";
+import { BookOpenText, FileUp, QrCode, UserRoundPlus, UsersRound } from "lucide-react";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { LinkButton } from "@/components/ui/Button";
 import { requireAdmin } from "@/lib/auth/current-account";
@@ -51,6 +51,13 @@ export default async function AdminPage() {
             </LinkButton>
             <LinkButton href="/admin/uploads" icon={<FileUp aria-hidden="true" size={18} />} variant="secondary">
               {translate(locale, "admin.uploadOutcomes")}
+            </LinkButton>
+            <LinkButton
+              href="/admin/course-material"
+              icon={<BookOpenText aria-hidden="true" size={18} />}
+              variant="secondary"
+            >
+              {translate(locale, "admin.courseMaterial")}
             </LinkButton>
             <LinkButton href="/admin/qr" icon={<QrCode aria-hidden="true" size={18} />} variant="secondary">
               {translate(locale, "nav.qrCodes")}

@@ -38,6 +38,7 @@ export function AppHeader({ account, locale }: AppHeaderProps) {
             <>
               <Link href="/admin/accounts">{translate(locale, "nav.accounts")}</Link>
               <Link href="/admin/uploads">{translate(locale, "nav.uploads")}</Link>
+              <Link href="/admin/course-material">{translate(locale, "nav.courseMaterial")}</Link>
               <Link href="/admin/qr">{translate(locale, "nav.qrCodes")}</Link>
             </>
           ) : (
