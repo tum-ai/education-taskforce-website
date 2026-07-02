@@ -40,6 +40,14 @@
   color: var(--color-purple-700);
 }
 
+.modeGroup {
+  margin-left: auto;
+}
+
+.modeGroup button {
+  min-width: 84px;
+}
+
 .metaBar {
   border: 1px solid rgb(82 53 115 / 10%);
   border-radius: var(--radius-md);
@@ -174,6 +182,25 @@
   text-underline-offset: 3px;
 }
 
+.readPanel {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.readPreview {
+  min-height: 680px;
+  font-size: clamp(1.08rem, 1.25vw, 1.18rem);
+  padding: clamp(28px, 4vw, 56px);
+}
+
+.readPreview h1 {
+  font-size: clamp(2.4rem, 5vw, 4.6rem);
+}
+
+.readPreview h2 {
+  font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+}
+
 .preview :global(.markdown-active-block) {
   border-radius: var(--radius-md);
   background: rgb(154 100 217 / 10%);
@@ -198,5 +225,9 @@
   .editor,
   .preview {
     min-height: 420px;
+  }
+
+  .modeGroup {
+    margin-left: 0;
   }
 }

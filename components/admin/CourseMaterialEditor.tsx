@@ -31,6 +31,8 @@ type CourseMaterialEditorProps = {
   saveNote: (input: CourseNoteSaveInput & { locale?: Locale }) => Promise<CourseMaterialSaveResult>;
 };
 
+type EditorMode = "edit" | "view";
+
 function noteKey(dayNumber: DayNumber, ageGroup: CourseMaterialAgeGroup) {
   return `${dayNumber}:${ageGroup}`;
 }
@@ -102,6 +104,7 @@ export function CourseMaterialEditor({ locale, notes, saveNote }: CourseMaterial
   const editorRef = useRef<HTMLTextAreaElement>(null);
   const [selectedDay, setSelectedDay] = useState<DayNumber>(1);
   const [selectedAgeGroup, setSelectedAgeGroup] = useState<CourseMaterialAgeGroup>("younger");
+  const [mode, setMode] = useState<EditorMode>("view");
   const [noteMap, setNoteMap] = useState(() => normalizeNotes(notes));
   const [drafts, setDrafts] = useState(() => {
     const initialDrafts = new Map<string, string>();
@@ -116,17 +119,21 @@ export function CourseMaterialEditor({ locale, notes, saveNote }: CourseMaterial
   const selectedNote = noteMap.get(selectedKey);
   const markdown = drafts.get(selectedKey) ?? selectedNote?.markdown ?? createDefaultMarkdown(selectedDay, selectedAgeGroup);
   const deferredMarkdown = useDeferredValue(markdown);
-  const previewHtml = useMemo(() => renderMarkdownToHtml(deferredMarkdown, { activeLine }), [activeLine, deferredMarkdown]);
+  const readPreviewHtml = useMemo(() => renderMarkdownToHtml(deferredMarkdown), [deferredMarkdown]);
+  const editPreviewHtml = useMemo(() => renderMarkdownToHtml(deferredMarkdown, { activeLine }), [activeLine, deferredMarkdown]);
   const hasUnsavedChanges = markdown !== selectedNote?.markdown;
 
   useEffect(() => {
+    if (mode !== "edit") {
+      return;
+    }
     const editor = editorRef.current;
     if (!editor) {
       return;
     }
     editor.style.height = "auto";
     editor.style.height = `${Math.max(editor.scrollHeight, 560)}px`;
-  }, [markdown, selectedKey]);
+  }, [markdown, mode, selectedKey]);
 
   function updateActiveLineFromEditor(editor: HTMLTextAreaElement) {
     setActiveLine(getLineNumberForCursor(editor.value, editor.selectionStart));
@@ -188,6 +195,24 @@ export function CourseMaterialEditor({ locale, notes, saveNote }: CourseMaterial
             </button>
           ))}
         </div>
+        <div className={`${styles.group} ${styles.modeGroup}`} aria-label={translate(locale, "admin.courseMaterialModeSelector")}>
+          <button
+            aria-pressed={mode === "view"}
+            className={mode === "view" ? styles.active : ""}
+            onClick={() => setMode("view")}
+            type="button"
+          >
+            {translate(locale, "admin.courseMaterialMode.view")}
+          </button>
+          <button
+            aria-pressed={mode === "edit"}
+            className={mode === "edit" ? styles.active : ""}
+            onClick={() => setMode("edit")}
+            type="button"
+          >
+            {translate(locale, "admin.courseMaterialMode.edit")}
+          </button>
+        </div>
       </div>
       <div className={styles.metaBar}>
         <span>
@@ -195,40 +220,51 @@ export function CourseMaterialEditor({ locale, notes, saveNote }: CourseMaterial
         </span>
         {hasUnsavedChanges ? <strong>{translate(locale, "admin.courseMaterialUnsaved")}</strong> : null}
       </div>
-      <div className={styles.workspace}>
-        <section className={styles.panel} aria-labelledby="course-material-markdown">
+      {mode === "view" ? (
+        <section className={`${styles.panel} ${styles.readPanel}`} aria-labelledby="course-material-read-preview">
           <div className={styles.panelHeader}>
-            <h2 id="course-material-markdown">{translate(locale, "admin.courseMaterialMarkdown")}</h2>
+            <h2 id="course-material-read-preview">{translate(locale, "admin.courseMaterialRendered")}</h2>
           </div>
-          <textarea
-            aria-label={translate(locale, "admin.courseMaterialMarkdown")}
-            className={styles.editor}
-            onClick={(event) => updateActiveLineFromEditor(event.currentTarget)}
-            onChange={(event) => {
-              const nextValue = event.target.value;
-              setDrafts((current) => new Map(current).set(selectedKey, nextValue));
-              setActiveLine(getLineNumberForCursor(nextValue, event.target.selectionStart));
-            }}
-            onKeyUp={(event) => updateActiveLineFromEditor(event.currentTarget)}
-            onSelect={(event) => updateActiveLineFromEditor(event.currentTarget)}
-            ref={editorRef}
-            spellCheck={false}
-            value={markdown}
-          />
+          <div className={`${styles.preview} ${styles.readPreview}`} dangerouslySetInnerHTML={{ __html: readPreviewHtml }} />
         </section>
-        <section className={styles.panel} aria-labelledby="course-material-preview">
-          <div className={styles.panelHeader}>
-            <h2 id="course-material-preview">{translate(locale, "admin.courseMaterialPreview")}</h2>
+      ) : (
+        <>
+          <div className={styles.workspace}>
+            <section className={styles.panel} aria-labelledby="course-material-markdown">
+              <div className={styles.panelHeader}>
+                <h2 id="course-material-markdown">{translate(locale, "admin.courseMaterialMarkdown")}</h2>
+              </div>
+              <textarea
+                aria-label={translate(locale, "admin.courseMaterialMarkdown")}
+                className={styles.editor}
+                onClick={(event) => updateActiveLineFromEditor(event.currentTarget)}
+                onChange={(event) => {
+                  const nextValue = event.target.value;
+                  setDrafts((current) => new Map(current).set(selectedKey, nextValue));
+                  setActiveLine(getLineNumberForCursor(nextValue, event.target.selectionStart));
+                }}
+                onKeyUp={(event) => updateActiveLineFromEditor(event.currentTarget)}
+                onSelect={(event) => updateActiveLineFromEditor(event.currentTarget)}
+                ref={editorRef}
+                spellCheck={false}
+                value={markdown}
+              />
+            </section>
+            <section className={styles.panel} aria-labelledby="course-material-preview">
+              <div className={styles.panelHeader}>
+                <h2 id="course-material-preview">{translate(locale, "admin.courseMaterialPreview")}</h2>
+              </div>
+              <div className={styles.preview} dangerouslySetInnerHTML={{ __html: editPreviewHtml }} />
+            </section>
           </div>
-          <div className={styles.preview} dangerouslySetInnerHTML={{ __html: previewHtml }} />
-        </section>
-      </div>
-      <div className={styles.actions}>
-        <Button disabled={isSaving || !hasUnsavedChanges} icon={<Save aria-hidden="true" size={18} />} onClick={handleSave}>
-          {isSaving ? translate(locale, "admin.courseMaterialSaving") : translate(locale, "admin.courseMaterialSave")}
-        </Button>
-        {status ? <span className={styles.status}>{status}</span> : null}
-      </div>
+          <div className={styles.actions}>
+            <Button disabled={isSaving || !hasUnsavedChanges} icon={<Save aria-hidden="true" size={18} />} onClick={handleSave}>
+              {isSaving ? translate(locale, "admin.courseMaterialSaving") : translate(locale, "admin.courseMaterialSave")}
+            </Button>
+            {status ? <span className={styles.status}>{status}</span> : null}
+          </div>
+        </>
+      )}
     </div>
   );
 }

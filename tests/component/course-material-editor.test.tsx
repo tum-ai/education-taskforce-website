@@ -6,7 +6,7 @@ import { CourseMaterialEditor } from "@/components/admin/CourseMaterialEditor";
 const saveNote = vi.fn();
 
 describe("CourseMaterialEditor", () => {
-  it("renders a live markdown preview for the selected day and age group", () => {
+  it("opens in read mode with a large rendered preview", () => {
     render(
       <CourseMaterialEditor
         locale="en"
@@ -29,6 +29,34 @@ describe("CourseMaterialEditor", () => {
     );
 
     expect(screen.getByRole("heading", { name: "Younger day one" })).toBeInTheDocument();
+    expect(screen.queryByRole("textbox", { name: "Markdown" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Edit" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "View" })).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("shows the editable split preview after clicking edit", () => {
+    render(
+      <CourseMaterialEditor
+        locale="en"
+        notes={[
+          {
+            ageGroup: "younger",
+            dayNumber: 1,
+            markdown: "# Younger day one\n\n- Start simple",
+            updatedAt: null,
+          },
+          {
+            ageGroup: "older",
+            dayNumber: 1,
+            markdown: "# Older day one\n\n- Go deeper",
+            updatedAt: null,
+          },
+        ]}
+        saveNote={saveNote}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
 
     fireEvent.click(screen.getByRole("button", { name: "Ages 12-18" }));
 
@@ -52,6 +80,8 @@ describe("CourseMaterialEditor", () => {
         saveNote={saveNote}
       />,
     );
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
 
     const textarea = screen.getByRole("textbox", { name: "Markdown" }) as HTMLTextAreaElement;
     const cursorPosition = markdown.indexOf("Keep moving");
