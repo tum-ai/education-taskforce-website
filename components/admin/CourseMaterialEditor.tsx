@@ -1,7 +1,7 @@
 "use client";
 
 import { Save } from "lucide-react";
-import { useDeferredValue, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import {
   COURSE_MATERIAL_AGE_GROUPS,
@@ -94,7 +94,12 @@ function normalizeNotes(notes: CourseNote[]) {
   return map;
 }
 
+function getLineNumberForCursor(markdown: string, cursorPosition: number) {
+  return markdown.slice(0, cursorPosition).split("\n").length;
+}
+
 export function CourseMaterialEditor({ locale, notes, saveNote }: CourseMaterialEditorProps) {
+  const editorRef = useRef<HTMLTextAreaElement>(null);
   const [selectedDay, setSelectedDay] = useState<DayNumber>(1);
   const [selectedAgeGroup, setSelectedAgeGroup] = useState<CourseMaterialAgeGroup>("younger");
   const [noteMap, setNoteMap] = useState(() => normalizeNotes(notes));
@@ -105,13 +110,27 @@ export function CourseMaterialEditor({ locale, notes, saveNote }: CourseMaterial
   });
   const [isSaving, setIsSaving] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+  const [activeLine, setActiveLine] = useState(1);
 
   const selectedKey = noteKey(selectedDay, selectedAgeGroup);
   const selectedNote = noteMap.get(selectedKey);
   const markdown = drafts.get(selectedKey) ?? selectedNote?.markdown ?? createDefaultMarkdown(selectedDay, selectedAgeGroup);
   const deferredMarkdown = useDeferredValue(markdown);
-  const previewHtml = useMemo(() => renderMarkdownToHtml(deferredMarkdown), [deferredMarkdown]);
+  const previewHtml = useMemo(() => renderMarkdownToHtml(deferredMarkdown, { activeLine }), [activeLine, deferredMarkdown]);
   const hasUnsavedChanges = markdown !== selectedNote?.markdown;
+
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor) {
+      return;
+    }
+    editor.style.height = "auto";
+    editor.style.height = `${Math.max(editor.scrollHeight, 560)}px`;
+  }, [markdown, selectedKey]);
+
+  function updateActiveLineFromEditor(editor: HTMLTextAreaElement) {
+    setActiveLine(getLineNumberForCursor(editor.value, editor.selectionStart));
+  }
 
   async function handleSave() {
     setIsSaving(true);
@@ -143,6 +162,7 @@ export function CourseMaterialEditor({ locale, notes, saveNote }: CourseMaterial
               key={dayNumber}
               onClick={() => {
                 setSelectedDay(dayNumber);
+                setActiveLine(1);
                 setStatus(null);
               }}
               type="button"
@@ -159,6 +179,7 @@ export function CourseMaterialEditor({ locale, notes, saveNote }: CourseMaterial
               key={ageGroup}
               onClick={() => {
                 setSelectedAgeGroup(ageGroup);
+                setActiveLine(1);
                 setStatus(null);
               }}
               type="button"
@@ -182,10 +203,15 @@ export function CourseMaterialEditor({ locale, notes, saveNote }: CourseMaterial
           <textarea
             aria-label={translate(locale, "admin.courseMaterialMarkdown")}
             className={styles.editor}
+            onClick={(event) => updateActiveLineFromEditor(event.currentTarget)}
             onChange={(event) => {
               const nextValue = event.target.value;
               setDrafts((current) => new Map(current).set(selectedKey, nextValue));
+              setActiveLine(getLineNumberForCursor(nextValue, event.target.selectionStart));
             }}
+            onKeyUp={(event) => updateActiveLineFromEditor(event.currentTarget)}
+            onSelect={(event) => updateActiveLineFromEditor(event.currentTarget)}
+            ref={editorRef}
             spellCheck={false}
             value={markdown}
           />

@@ -42,38 +42,70 @@ function renderInline(markdown: string): string {
   return html;
 }
 
-export function renderMarkdownToHtml(markdown: string): string {
+type RenderMarkdownOptions = {
+  activeLine?: number;
+};
+
+function createBlockAttributes(startLine: number, endLine: number, options: RenderMarkdownOptions) {
+  const activeLine = options.activeLine;
+  const className = activeLine && activeLine >= startLine && activeLine <= endLine ? ' class="markdown-active-block"' : "";
+  return ` data-source-line="${startLine}"${className}`;
+}
+
+export function renderMarkdownToHtml(markdown: string, options: RenderMarkdownOptions = {}): string {
   const lines = markdown.replace(/\r\n?/g, "\n").split("\n");
   const output: string[] = [];
   let paragraph: string[] = [];
+  let paragraphStartLine: number | null = null;
+  let paragraphEndLine: number | null = null;
   let listItems: string[] = [];
   let listType: "ol" | "ul" | null = null;
+  let listStartLine: number | null = null;
+  let listEndLine: number | null = null;
   let blockquote: string[] = [];
-  let codeFence: string[] | null = null;
+  let blockquoteStartLine: number | null = null;
+  let blockquoteEndLine: number | null = null;
+  let codeFence: { lines: string[]; startLine: number; endLine: number } | null = null;
 
   function flushParagraph() {
     if (paragraph.length === 0) {
       return;
     }
-    output.push(`<p>${renderInline(paragraph.join(" "))}</p>`);
+    output.push(
+      `<p${createBlockAttributes(paragraphStartLine ?? 1, paragraphEndLine ?? paragraphStartLine ?? 1, options)}>${renderInline(paragraph.join(" "))}</p>`,
+    );
     paragraph = [];
+    paragraphStartLine = null;
+    paragraphEndLine = null;
   }
 
   function flushList() {
     if (!listType || listItems.length === 0) {
       return;
     }
-    output.push(`<${listType}>${listItems.map((item) => `<li>${renderInline(item)}</li>`).join("")}</${listType}>`);
+    output.push(
+      `<${listType}${createBlockAttributes(listStartLine ?? 1, listEndLine ?? listStartLine ?? 1, options)}>${listItems
+        .map((item) => `<li>${renderInline(item)}</li>`)
+        .join("")}</${listType}>`,
+    );
     listType = null;
     listItems = [];
+    listStartLine = null;
+    listEndLine = null;
   }
 
   function flushBlockquote() {
     if (blockquote.length === 0) {
       return;
     }
-    output.push(`<blockquote><p>${renderInline(blockquote.join(" "))}</p></blockquote>`);
+    output.push(
+      `<blockquote${createBlockAttributes(blockquoteStartLine ?? 1, blockquoteEndLine ?? blockquoteStartLine ?? 1, options)}><p>${renderInline(
+        blockquote.join(" "),
+      )}</p></blockquote>`,
+    );
     blockquote = [];
+    blockquoteStartLine = null;
+    blockquoteEndLine = null;
   }
 
   function flushOpenBlocks() {
@@ -82,22 +114,30 @@ export function renderMarkdownToHtml(markdown: string): string {
     flushBlockquote();
   }
 
-  for (const line of lines) {
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    const lineNumber = index + 1;
     const trimmed = line.trim();
 
     if (codeFence) {
       if (trimmed.startsWith("```")) {
-        output.push(`<pre><code>${escapeHtml(codeFence.join("\n"))}</code></pre>`);
+        codeFence.endLine = lineNumber;
+        output.push(
+          `<pre${createBlockAttributes(codeFence.startLine, codeFence.endLine, options)}><code>${escapeHtml(
+            codeFence.lines.join("\n"),
+          )}</code></pre>`,
+        );
         codeFence = null;
       } else {
-        codeFence.push(line);
+        codeFence.lines.push(line);
+        codeFence.endLine = lineNumber;
       }
       continue;
     }
 
     if (trimmed.startsWith("```")) {
       flushOpenBlocks();
-      codeFence = [];
+      codeFence = { endLine: lineNumber, lines: [], startLine: lineNumber };
       continue;
     }
 
@@ -110,13 +150,13 @@ export function renderMarkdownToHtml(markdown: string): string {
     if (headingMatch) {
       flushOpenBlocks();
       const level = headingMatch[1].length;
-      output.push(`<h${level}>${renderInline(headingMatch[2])}</h${level}>`);
+      output.push(`<h${level}${createBlockAttributes(lineNumber, lineNumber, options)}>${renderInline(headingMatch[2])}</h${level}>`);
       continue;
     }
 
     if (/^(-{3,}|\*{3,})$/.test(trimmed)) {
       flushOpenBlocks();
-      output.push("<hr>");
+      output.push(`<hr${createBlockAttributes(lineNumber, lineNumber, options)}>`);
       continue;
     }
 
@@ -130,6 +170,8 @@ export function renderMarkdownToHtml(markdown: string): string {
         flushList();
       }
       listType = nextType;
+      listStartLine ??= lineNumber;
+      listEndLine = lineNumber;
       listItems.push((unorderedMatch ?? orderedMatch)?.[1] ?? "");
       continue;
     }
@@ -138,17 +180,25 @@ export function renderMarkdownToHtml(markdown: string): string {
     if (quoteMatch) {
       flushParagraph();
       flushList();
+      blockquoteStartLine ??= lineNumber;
+      blockquoteEndLine = lineNumber;
       blockquote.push(quoteMatch[1]);
       continue;
     }
 
     flushList();
     flushBlockquote();
+    paragraphStartLine ??= lineNumber;
+    paragraphEndLine = lineNumber;
     paragraph.push(trimmed);
   }
 
   if (codeFence) {
-    output.push(`<pre><code>${escapeHtml(codeFence.join("\n"))}</code></pre>`);
+    output.push(
+      `<pre${createBlockAttributes(codeFence.startLine, codeFence.endLine, options)}><code>${escapeHtml(
+        codeFence.lines.join("\n"),
+      )}</code></pre>`,
+    );
   }
   flushOpenBlocks();
 
