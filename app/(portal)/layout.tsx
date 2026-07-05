@@ -1,6 +1,10 @@
 import { Footer } from "@/components/layout/Footer";
 import { getRequestLocale } from "@/lib/i18n/server";
 
+export const metadata = {
+  robots: { index: false, follow: false },
+};
+
 export default async function PortalLayout({
   children,
 }: Readonly<{

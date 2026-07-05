@@ -7,6 +7,10 @@ import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  robots: { index: false, follow: false },
+};
+
 type LangdockScanPageProps = {
   params: Promise<{
     token: string;

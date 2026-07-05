@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { loginSchema, usernameToInternalEmail } from "@/lib/validation/auth";
 import { getCurrentAccount } from "@/lib/auth/current-account";
+import { sanitizeNextPath } from "@/lib/auth/protected-paths";
 import { LOCALE_COOKIE, normalizeLocale, translate } from "@/lib/i18n/translations";
 
 export type LoginActionState = {
@@ -57,10 +58,8 @@ export async function loginAction(_previousState: LoginActionState, formData: Fo
   }
 
   const account = await getCurrentAccount();
+  const role = account?.role === "admin" ? "admin" : "participant";
+  const nextPath = sanitizeNextPath(formData.get("next"), role);
 
-  if (account?.role === "admin") {
-    redirect("/admin");
-  }
-
-  redirect("/portal");
+  redirect(nextPath ?? (role === "admin" ? "/admin" : "/portal"));
 }

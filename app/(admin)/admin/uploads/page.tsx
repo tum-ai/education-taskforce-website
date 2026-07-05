@@ -5,7 +5,7 @@ import { listParticipantAccounts } from "@/lib/data/accounts";
 import { listRecentUploads } from "@/lib/data/uploads";
 import { getRequestLocale } from "@/lib/i18n/server";
 import { translate } from "@/lib/i18n/translations";
-import { uploadOutcomeFormAction } from "./actions";
+import { finalizeUploadAction, prepareUploadAction } from "./actions";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -25,7 +25,13 @@ export default async function AdminUploadsPage() {
             <h1 id="uploads-title">{translate(locale, "admin.uploadsTitle")}</h1>
             <p>{translate(locale, "admin.uploadsBody")}</p>
           </div>
-          <UploadManagement accounts={accounts} action={uploadOutcomeFormAction} locale={locale} uploads={uploads} />
+          <UploadManagement
+            accounts={accounts}
+            finalizeAction={finalizeUploadAction}
+            locale={locale}
+            prepareAction={prepareUploadAction}
+            uploads={uploads}
+          />
         </section>
       </main>
     </>

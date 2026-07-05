@@ -27,9 +27,14 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 SUPABASE_SECRET_KEY=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+LANGDOCK_QR_SIGNING_SECRET=
 ```
 
 Legacy Supabase projects may use `SUPABASE_SERVICE_ROLE_KEY` instead of `SUPABASE_SECRET_KEY`.
+
+`LANGDOCK_QR_SIGNING_SECRET` signs the Langdock/Lovable QR scan tokens. Generate it with
+`openssl rand -base64 48`. Rotating it invalidates all previously printed QR codes —
+reprint them from the admin QR pages afterwards.
 
 ## Supabase
 
