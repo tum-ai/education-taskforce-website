@@ -1,4 +1,4 @@
-import { LogOut, Shield, UserRound } from "lucide-react";
+import { LogOut, Menu, Shield, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { Account } from "@/lib/domain/types";
@@ -18,6 +18,12 @@ type AppHeaderProps = {
 
 export function AppHeader({ account, locale }: AppHeaderProps) {
   const isAdmin = account.role === "admin";
+  const adminLinks = [
+    { href: "/admin/accounts", label: translate(locale, "nav.accounts") },
+    { href: "/admin/uploads", label: translate(locale, "nav.uploads") },
+    { href: "/admin/course-material", label: translate(locale, "nav.courseMaterial") },
+    { href: "/admin/qr", label: translate(locale, "nav.qrCodes") },
+  ];
 
   return (
     <header className={styles.header}>
@@ -36,10 +42,11 @@ export function AppHeader({ account, locale }: AppHeaderProps) {
         <nav className={styles.nav} aria-label={translate(locale, "nav.account")}>
           {isAdmin ? (
             <>
-              <Link href="/admin/accounts">{translate(locale, "nav.accounts")}</Link>
-              <Link href="/admin/uploads">{translate(locale, "nav.uploads")}</Link>
-              <Link href="/admin/course-material">{translate(locale, "nav.courseMaterial")}</Link>
-              <Link href="/admin/qr">{translate(locale, "nav.qrCodes")}</Link>
+              {adminLinks.map((link) => (
+                <Link href={link.href} key={link.href}>
+                  {link.label}
+                </Link>
+              ))}
             </>
           ) : (
             <Link href="/portal">{translate(locale, "nav.dayOverview")}</Link>
@@ -68,6 +75,51 @@ export function AppHeader({ account, locale }: AppHeaderProps) {
             </Button>
           </form>
         </nav>
+        <details className={styles.mobileMenu}>
+          <summary aria-label={translate(locale, "nav.account")}>
+            <Menu aria-hidden="true" size={22} />
+          </summary>
+          <div className={styles.drawer}>
+            <div className={styles.drawerHeader}>
+              <span>{isAdmin ? translate(locale, "nav.adminOverview") : account.displayName}</span>
+            </div>
+            <nav className={styles.drawerNav} aria-label={translate(locale, "nav.account")}>
+              {isAdmin ? (
+                <>
+                  <Link aria-label={translate(locale, "nav.openAdminOverview")} className={styles.account} href="/admin">
+                    <Shield aria-hidden="true" size={16} />
+                    {translate(locale, "nav.adminOverview")}
+                  </Link>
+                  {adminLinks.map((link) => (
+                    <Link href={link.href} key={link.href}>
+                      {link.label}
+                    </Link>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <span className={styles.account}>
+                    <UserRound aria-hidden="true" size={16} />
+                    {account.displayName}
+                  </span>
+                  <Link href="/portal">{translate(locale, "nav.dayOverview")}</Link>
+                </>
+              )}
+              <LanguageToggle
+                labels={{
+                  english: translate(locale, "language.english"),
+                  german: translate(locale, "language.german"),
+                }}
+                locale={locale}
+              />
+              <form action={signOut}>
+                <Button icon={<LogOut aria-hidden="true" size={16} />} size="sm" type="submit" variant="ghost" fullWidth>
+                  {translate(locale, "nav.logout")}
+                </Button>
+              </form>
+            </nav>
+          </div>
+        </details>
       </div>
     </header>
   );

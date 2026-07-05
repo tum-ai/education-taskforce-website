@@ -28,6 +28,10 @@ describe("AppHeader", () => {
       />,
     );
 
-    expect(screen.getByRole("link", { name: "QR-Codes" })).toHaveAttribute("href", "/admin/qr");
+    expect(screen.getAllByRole("link", { name: "QR-Codes" }).map((link) => link.getAttribute("href"))).toEqual([
+      "/admin/qr",
+      "/admin/qr",
+    ]);
+    expect(screen.getByLabelText("Account navigation", { selector: "summary" })).toBeInTheDocument();
   });
 });
