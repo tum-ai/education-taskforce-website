@@ -7,6 +7,10 @@ import styles from "../../k/[token]/page.module.css";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  robots: { index: false, follow: false },
+};
+
 type LovableScanPageProps = {
   params: Promise<{
     token: string;

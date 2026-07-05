@@ -10,9 +10,14 @@ import styles from "./page.module.css";
 
 type LoginPageProps = {
   searchParams: Promise<{
-    u?: string;
+    u?: string | string[];
+    next?: string | string[];
   }>;
 };
+
+function firstParam(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const locale = await getRequestLocale();
@@ -27,7 +32,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   }
 
   const params = await searchParams;
-  const defaultUsername = params.u ? normalizeUsername(params.u) : "";
+  const usernameParam = firstParam(params.u);
+  const defaultUsername = usernameParam ? normalizeUsername(usernameParam) : "";
+  // Validated again in loginAction; the loose check just avoids carrying obvious junk.
+  const nextParam = firstParam(params.next);
+  const nextPath = nextParam?.startsWith("/") ? nextParam : undefined;
 
   return (
     <>
@@ -40,7 +49,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             <p>{translate(locale, "login.body")}</p>
           </div>
           <div className={styles.formPanel}>
-            <LoginForm action={loginAction} defaultUsername={defaultUsername} locale={locale} />
+            <LoginForm action={loginAction} defaultUsername={defaultUsername} locale={locale} nextPath={nextPath} />
           </div>
         </section>
       </main>

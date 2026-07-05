@@ -13,19 +13,21 @@ type LoginFormProps = {
   action: (previousState: LoginActionState, formData: FormData) => Promise<LoginActionState>;
   defaultUsername?: string;
   locale: Locale;
+  nextPath?: string;
 };
 
 const initialState: LoginActionState = {
   status: "idle",
 };
 
-export function LoginForm({ action, defaultUsername = "", locale }: LoginFormProps) {
+export function LoginForm({ action, defaultUsername = "", locale, nextPath }: LoginFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialState);
 
   return (
     <form action={formAction} className={styles.form}>
       {state.message ? <ErrorMessage message={state.message} title={translate(locale, "login.failed")} /> : null}
       <input name={LOCALE_COOKIE} type="hidden" value={locale} />
+      {nextPath ? <input name="next" type="hidden" value={nextPath} /> : null}
       <TextInput
         autoComplete="username"
         defaultValue={defaultUsername}

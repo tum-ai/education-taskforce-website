@@ -1,11 +1,17 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, type FormEvent } from "react";
 import { UploadCloud } from "lucide-react";
 import type { Account, DayUpload } from "@/lib/domain/types";
 import { getProgramDays } from "@/lib/domain/days";
-import { LOCALE_COOKIE, translate, type Locale } from "@/lib/i18n/translations";
-import type { UploadActionState } from "@/app/(admin)/admin/uploads/actions";
+import { translate, type Locale } from "@/lib/i18n/translations";
+import type {
+  PrepareUploadResult,
+  UploadActionState,
+  UploadMetadataInput,
+} from "@/app/(admin)/admin/uploads/actions";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { PARTICIPANT_UPLOADS_BUCKET } from "@/lib/storage/paths";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -17,7 +23,8 @@ import styles from "./UploadManagement.module.css";
 type UploadManagementProps = {
   accounts: Account[];
   uploads: DayUpload[];
-  action: (previousState: UploadActionState, formData: FormData) => Promise<UploadActionState>;
+  prepareAction: (input: UploadMetadataInput) => Promise<PrepareUploadResult>;
+  finalizeAction: (input: UploadMetadataInput & { uploadId: string }) => Promise<UploadActionState>;
   locale: Locale;
 };
 
@@ -25,9 +32,69 @@ const initialState: UploadActionState = {
   status: "idle",
 };
 
-export function UploadManagement({ accounts, uploads, action, locale }: UploadManagementProps) {
-  const [state, formAction, isPending] = useActionState(action, initialState);
+export function UploadManagement({ accounts, uploads, prepareAction, finalizeAction, locale }: UploadManagementProps) {
+  const [state, setState] = useState<UploadActionState>(initialState);
+  const [isPending, setIsPending] = useState(false);
   const days = getProgramDays(locale);
+
+  // The file goes straight from the browser to Supabase Storage: server-action
+  // bodies are size-capped (1 MB default, ~4.5 MB on Vercel), so only metadata
+  // may pass through the prepare/finalize actions.
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const file = formData.get("file");
+
+    setIsPending(true);
+    setState(initialState);
+
+    try {
+      if (!(file instanceof File) || !file.name) {
+        setState({ status: "error", fieldErrors: { file: translate(locale, "admin.chooseFile") } });
+        return;
+      }
+
+      const metadata: UploadMetadataInput = {
+        locale,
+        accountId: String(formData.get("accountId") ?? ""),
+        dayNumber: String(formData.get("dayNumber") ?? ""),
+        title: String(formData.get("title") ?? ""),
+        fileName: file.name,
+        fileSize: file.size,
+        fileMimeType: file.type,
+      };
+
+      const prepared = await prepareAction(metadata);
+      if (prepared.status !== "ready") {
+        setState(prepared);
+        return;
+      }
+
+      const supabase = createSupabaseBrowserClient();
+      const { error } = await supabase.storage
+        .from(PARTICIPANT_UPLOADS_BUCKET)
+        .uploadToSignedUrl(prepared.storagePath, prepared.uploadToken, file, {
+          contentType: file.type || "application/octet-stream",
+        });
+
+      if (error) {
+        setState({ status: "error", message: translate(locale, "admin.couldNotUploadFile") });
+        return;
+      }
+
+      const result = await finalizeAction({ ...metadata, uploadId: prepared.uploadId });
+      setState(result);
+
+      if (result.status === "success") {
+        form.reset();
+      }
+    } catch {
+      setState({ status: "error", message: translate(locale, "admin.couldNotUploadFile") });
+    } finally {
+      setIsPending(false);
+    }
+  }
 
   return (
     <div className={styles.layout}>
@@ -39,8 +106,7 @@ export function UploadManagement({ accounts, uploads, action, locale }: UploadMa
             <p>{translate(locale, "admin.addOutcomeBody")}</p>
           </div>
         </div>
-        <form action={formAction} className={styles.form}>
-          <input name={LOCALE_COOKIE} type="hidden" value={locale} />
+        <form className={styles.form} onSubmit={handleSubmit}>
           {state.message && state.status === "error" ? (
             <ErrorMessage message={state.message} title={translate(locale, "admin.uploadFailed")} />
           ) : null}

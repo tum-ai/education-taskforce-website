@@ -1,11 +1,13 @@
 begin;
 
-select plan(18);
+select plan(26);
 
 select has_table('public', 'accounts', 'accounts table exists');
 select has_table('public', 'day_uploads', 'day_uploads table exists');
 select has_table('public', 'participant_credentials', 'participant credentials table exists');
 select has_table('public', 'langdock_credentials', 'langdock credentials table exists');
+select has_table('public', 'lovable_credentials', 'lovable credentials table exists');
+select has_table('public', 'course_notes', 'course notes table exists');
 select ok(
   exists (
     select 1
@@ -71,6 +73,63 @@ select is(
   (select rowsecurity from pg_tables where schemaname = 'public' and tablename = 'langdock_credentials'),
   true,
   'langdock_credentials RLS is enabled'
+);
+select is(
+  (select rowsecurity from pg_tables where schemaname = 'public' and tablename = 'lovable_credentials'),
+  true,
+  'lovable_credentials RLS is enabled'
+);
+select is(
+  (select rowsecurity from pg_tables where schemaname = 'public' and tablename = 'course_notes'),
+  true,
+  'course_notes RLS is enabled'
+);
+-- Admin-only access: every command must have a policy gated on current_user_is_admin().
+-- coalesce(qual, with_check) covers INSERT policies, which only set with_check.
+select is(
+  (
+    select count(distinct cmd)
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'lovable_credentials'
+      and coalesce(qual, with_check) like '%current_user_is_admin%'
+  ),
+  4::bigint,
+  'lovable_credentials has admin-gated policies for select/insert/update/delete'
+);
+select is(
+  (
+    select count(distinct cmd)
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'course_notes'
+      and coalesce(qual, with_check) like '%current_user_is_admin%'
+  ),
+  4::bigint,
+  'course_notes has admin-gated policies for select/insert/update/delete'
+);
+-- No policy (including any future anon policy) may grant access without the admin check.
+select is(
+  (
+    select count(*)
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'lovable_credentials'
+      and coalesce(qual, with_check) not like '%current_user_is_admin%'
+  ),
+  0::bigint,
+  'lovable_credentials has no policies that bypass the admin check'
+);
+select is(
+  (
+    select count(*)
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'course_notes'
+      and coalesce(qual, with_check) not like '%current_user_is_admin%'
+  ),
+  0::bigint,
+  'course_notes has no policies that bypass the admin check'
 );
 select is(
   (select public from storage.buckets where id = 'participant-uploads'),

@@ -1,7 +1,6 @@
 import "server-only";
 
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
-import { getAdminSupabaseEnv } from "@/lib/supabase/env";
 
 const TOKEN_VERSION = "v1";
 
@@ -50,7 +49,15 @@ function signPayload(payload: string): string {
 }
 
 function getTokenSecret(): string {
-  return process.env.LANGDOCK_QR_SIGNING_SECRET ?? getAdminSupabaseEnv().secretKey;
+  const secret = process.env.LANGDOCK_QR_SIGNING_SECRET;
+
+  if (!secret) {
+    throw new Error(
+      "Missing LANGDOCK_QR_SIGNING_SECRET. Generate one with `openssl rand -base64 48` and set it in the environment. Rotating it invalidates existing QR codes.",
+    );
+  }
+
+  return secret;
 }
 
 function safeEqual(first: string, second: string): boolean {
