@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, Copy, ExternalLink } from "lucide-react";
 import type { LangdockCredential } from "@/lib/domain/langdock";
 import { translate, type Locale } from "@/lib/i18n/translations";
@@ -22,7 +22,19 @@ type CopyKey = "email" | "password" | null;
 
 export function LangdockScanPanel({ credential, labels, locale }: LangdockScanPanelProps) {
   const [copied, setCopied] = useState<CopyKey>(null);
+  const hasAutoOpened = useRef(false);
   const meta = [credential.group, credential.device].filter(Boolean).join(" / ");
+
+  // Best-effort convenience: most desktop browsers allow a same-tick popup on
+  // navigation, but mobile browsers commonly block window.open() without a
+  // user gesture. The manual link below is the reliable fallback either way.
+  useEffect(() => {
+    if (hasAutoOpened.current) {
+      return;
+    }
+    hasAutoOpened.current = true;
+    window.open(credential.loginUrl, "_blank", "noopener,noreferrer");
+  }, [credential.loginUrl]);
   const resolvedLabels = {
     assignedLogin: translate(locale, "langdock.assignedLogin"),
     email: translate(locale, "langdock.email"),

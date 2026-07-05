@@ -17,8 +17,11 @@ const qrOptions = {
   },
 } as const;
 
-export async function createLoginQrDataUrl(username: string): Promise<{ payload: string; dataUrl: string }> {
-  const payload = createLoginQrPayload(username, process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000");
+export async function createLoginQrDataUrl(
+  username: string,
+  siteUrl: string,
+): Promise<{ payload: string; dataUrl: string }> {
+  const payload = createLoginQrPayload(username, siteUrl);
   const dataUrl = await QRCode.toDataURL(payload, qrOptions);
 
   return { payload, dataUrl };

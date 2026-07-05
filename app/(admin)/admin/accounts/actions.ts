@@ -3,6 +3,7 @@
 import { requireAdmin } from "@/lib/auth/current-account";
 import { createParticipantAccount, resetParticipantPassword } from "@/lib/data/accounts";
 import { LOCALE_COOKIE, normalizeLocale, translate } from "@/lib/i18n/translations";
+import { getCurrentRequestOrigin } from "@/lib/qr/origin";
 import { createLoginQrDataUrl } from "@/lib/qr/qrcode";
 import { participantAccountSchema } from "@/lib/validation/auth";
 
@@ -49,7 +50,7 @@ export async function createParticipantFormAction(
 
   try {
     const result = await createParticipantAccount(parsed.data);
-    const qr = await createLoginQrDataUrl(result.account.username);
+    const qr = await createLoginQrDataUrl(result.account.username, await getCurrentRequestOrigin());
 
     return {
       ...idleState,
@@ -87,7 +88,7 @@ export async function resetParticipantPasswordFormAction(
 
   try {
     const result = await resetParticipantPassword(accountId);
-    const qr = await createLoginQrDataUrl(result.account.username);
+    const qr = await createLoginQrDataUrl(result.account.username, await getCurrentRequestOrigin());
 
     return {
       status: "success",
