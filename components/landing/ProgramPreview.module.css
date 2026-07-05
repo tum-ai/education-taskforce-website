@@ -1,8 +1,19 @@
 .section {
   background:
-    linear-gradient(180deg, #050506 0, var(--color-white) 92px),
+    linear-gradient(
+      180deg,
+      #050506 0,
+      #050506 18px,
+      rgb(5 5 6 / 96%) 48px,
+      rgb(21 21 23 / 88%) 86px,
+      rgb(55 55 58 / 72%) 132px,
+      rgb(112 109 118 / 48%) 184px,
+      rgb(211 204 221 / 28%) 236px,
+      rgb(245 239 255 / 18%) 276px,
+      var(--color-white) 332px
+    ),
     var(--color-white);
-  padding: 92px 0 104px;
+  padding: 152px 0 104px;
 }
 
 .header {
@@ -215,7 +226,11 @@
 
 @media (max-width: 560px) {
   .section {
-    padding: 64px 0 74px;
+    padding: 154px 0 74px;
+  }
+
+  .section :global(.container) {
+    width: min(var(--container), calc(100% - 48px));
   }
 
   .header {

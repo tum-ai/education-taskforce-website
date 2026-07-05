@@ -9,10 +9,13 @@ type SparklesCoreProps = {
   minSize?: number;
   maxSize?: number;
   particleDensity?: number;
+  mobileParticleDensity?: number;
   className?: string;
   particleColor?: string;
   speed?: number;
   maxParticles?: number;
+  mobileMaxParticles?: number;
+  mobileMaxWidth?: number;
 };
 
 type Particle = {
@@ -33,10 +36,13 @@ export function SparklesCore({
   minSize = 0.4,
   maxSize = 1.2,
   particleDensity = 100,
+  mobileParticleDensity,
   className,
   particleColor = "#FFFFFF",
   speed = 0.7,
   maxParticles = 900,
+  mobileMaxParticles,
+  mobileMaxWidth = 680,
 }: SparklesCoreProps) {
   const generatedId = useId();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -72,10 +78,17 @@ export function SparklesCore({
 
     const resize = () => {
       const { width, height } = canvas.getBoundingClientRect();
+      const useMobileSettings = window.innerWidth <= mobileMaxWidth;
+      const resolvedDensity = useMobileSettings && mobileParticleDensity ? mobileParticleDensity : particleDensity;
+      const resolvedMaxParticles = useMobileSettings && mobileMaxParticles ? mobileMaxParticles : maxParticles;
+
       canvas.width = Math.max(1, Math.floor(width * pixelRatio));
       canvas.height = Math.max(1, Math.floor(height * pixelRatio));
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-      const count = Math.min(maxParticles, Math.max(48, Math.floor((width * height * particleDensity) / 750_000)));
+      const count = Math.min(
+        resolvedMaxParticles,
+        Math.max(24, Math.floor((width * height * resolvedDensity) / 750_000)),
+      );
       particles = Array.from({ length: count }, () => createParticle(width, height));
     };
 
@@ -132,7 +145,18 @@ export function SparklesCore({
       window.cancelAnimationFrame(frameId);
       window.removeEventListener("resize", resize);
     };
-  }, [background, maxParticles, maxSize, minSize, particleColor, particleDensity, speed]);
+  }, [
+    background,
+    maxParticles,
+    maxSize,
+    minSize,
+    mobileMaxParticles,
+    mobileMaxWidth,
+    mobileParticleDensity,
+    particleColor,
+    particleDensity,
+    speed,
+  ]);
 
   return (
     <canvas
