@@ -1,0 +1,53 @@
+name: E2E
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+
+concurrency:
+  group: e2e-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  e2e:
+    # Stable check name surfaced to branch protection as "E2E / Playwright E2E".
+    # Do not rename without updating branch protection.
+    #
+    # No Supabase env vars are set here: the app treats unset Supabase env as
+    # "logged out" rather than erroring (see lib/supabase/env.ts), and the
+    # current e2e suite only covers unauthenticated flows. If tests start
+    # covering real login/session behavior, wire up a local `supabase start`
+    # stack here first (see member-manager's e2e.yml for the pattern).
+    name: Playwright E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run Playwright E2E suite
+        run: pnpm test:e2e
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

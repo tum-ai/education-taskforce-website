@@ -79,3 +79,5 @@ pnpm build
 ```
 
 E2E tests start the local Next.js dev server automatically.
+
+CI runs lint, typecheck, test, build, and E2E on every PR and on push to `main`, plus CodeQL, dependency review, and a Supabase migration reset check for `supabase/**` changes. Pull request titles must follow Conventional Commits.

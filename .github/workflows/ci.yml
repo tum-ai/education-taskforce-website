@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+
+# Cancel superseded runs on a branch/PR, but never cancel main.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  # Detect whether a PR touches Supabase migrations, so the migration-reset
+  # job can skip entirely on changes that don't need it.
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      supabase: ${{ steps.filter.outputs.supabase }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Filter changed paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            supabase:
+              - 'supabase/**'
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
+      - name: Run lint
+        run: pnpm lint
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
+      - name: Run typecheck
+        run: pnpm typecheck
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
+      - name: Run tests
+        run: pnpm test
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
+      - name: Build
+        run: pnpm build
+
+  # Aggregates the required jobs under one name so branch protection only
+  # needs a single required check. Fails if any dependency failed or was
+  # cancelled.
+  required-checks:
+    name: Lint / Typecheck / Build / Test
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck, build, test]
+    if: ${{ always() }}
+    steps:
+      - name: Verify required jobs succeeded
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "A required job failed or was cancelled: ${{ join(needs.*.result, ', ') }}"
+          exit 1
+
+  workflow-lint:
+    name: Workflow Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Lint GitHub Actions workflows
+        uses: raven-actions/actionlint@v2
+
+  migrations:
+    name: Supabase Migration Reset
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.supabase == 'true'
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v2
+        with:
+          version: latest
+      - name: Start local Supabase stack
+        run: supabase db start
+      - name: Rebuild database from migrations
+        run: supabase db reset
