@@ -90,10 +90,11 @@ a.account:hover {
   display: none;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .inner {
     min-height: 64px;
     gap: 12px;
+    padding: 14px 0 12px;
   }
 
   .nav {
