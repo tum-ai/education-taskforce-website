@@ -17,6 +17,9 @@ export const metadata: Metadata = {
     template: "%s | AI Edutainment",
   },
   description: "A private five-day AI course portal for Schloss Elmau students aged 8-18.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default async function RootLayout({
