@@ -34,3 +34,19 @@
 .toggle button[aria-pressed="true"]:hover {
   background: var(--color-lavender-500);
 }
+
+@media (max-width: 620px) {
+  .toggle button {
+    min-width: 34px;
+    min-height: 34px;
+    padding: 0 7px;
+  }
+}
+
+@media (max-width: 360px) {
+  .toggle button {
+    min-width: 32px;
+    padding: 0 6px;
+    font-size: 0.72rem;
+  }
+}

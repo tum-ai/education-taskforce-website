@@ -80,5 +80,13 @@
   .previewShell {
     height: clamp(520px, 72svh, 760px);
     min-height: 520px;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+  }
+
+  .iframe {
+    display: block;
+    height: max(100%, 1200px);
+    min-height: 1200px;
   }
 }

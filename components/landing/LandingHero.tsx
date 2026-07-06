@@ -15,6 +15,8 @@ export function LandingHero() {
                 minSize={0.65}
                 maxSize={1.6}
                 maxParticles={12000}
+                mobileMaxParticles={13300}
+                mobileParticleDensity={53200}
                 particleDensity={32000}
                 className={styles.sparklesCanvas}
                 particleColor="#F5EFFF"
