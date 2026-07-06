@@ -98,10 +98,6 @@ export function AppHeader({ account, locale }: AppHeaderProps) {
                 </>
               ) : (
                 <>
-                  <span className={styles.account}>
-                    <UserRound aria-hidden="true" size={16} />
-                    {account.displayName}
-                  </span>
                   <Link href="/portal">{translate(locale, "nav.dayOverview")}</Link>
                 </>
               )}
