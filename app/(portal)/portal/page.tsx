@@ -1,4 +1,5 @@
 import { AppHeader } from "@/components/layout/AppHeader";
+import { CertificateCard } from "@/components/portal/CertificateCard";
 import { DayCard } from "@/components/portal/DayCard";
 import { createDayBuckets } from "@/lib/domain/days";
 import { requireParticipant } from "@/lib/auth/current-account";
@@ -37,6 +38,7 @@ export default async function PortalPage() {
               meta={translate(locale, "portal.whoMeta")}
               locale={locale}
             />
+            <CertificateCard locale={locale} />
           </div>
         </section>
       </main>
