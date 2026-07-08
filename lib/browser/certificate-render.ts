@@ -176,17 +176,59 @@ function getPartnerCopy(content: CertificateContent) {
   };
 }
 
+function getNumericDimension(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+function getImageSourceSize(logo: CanvasImageSource) {
+  const source = logo as {
+    height?: unknown;
+    naturalHeight?: unknown;
+    naturalWidth?: unknown;
+    videoHeight?: unknown;
+    videoWidth?: unknown;
+    width?: unknown;
+  };
+
+  return {
+    height:
+      getNumericDimension(source.naturalHeight) ||
+      getNumericDimension(source.videoHeight) ||
+      getNumericDimension(source.height),
+    width:
+      getNumericDimension(source.naturalWidth) ||
+      getNumericDimension(source.videoWidth) ||
+      getNumericDimension(source.width),
+  };
+}
+
+function getContainedImageSize(logo: CanvasImageSource, maxWidth: number, maxHeight: number) {
+  const intrinsic = getImageSourceSize(logo);
+
+  if (!intrinsic.width || !intrinsic.height) {
+    return { height: maxHeight, width: maxWidth };
+  }
+
+  const scale = Math.min(maxWidth / intrinsic.width, maxHeight / intrinsic.height);
+
+  return {
+    height: intrinsic.height * scale,
+    width: intrinsic.width * scale,
+  };
+}
+
 function drawLogoOrFallback(
   context: CanvasRenderingContext2D,
   logo: CanvasImageSource | undefined,
   fallbackText: string,
   x: number,
   y: number,
-  width: number,
-  height: number,
+  maxWidth: number,
+  maxHeight: number,
 ) {
   if (logo) {
-    context.drawImage(logo, x, y, width, height);
+    const size = getContainedImageSize(logo, maxWidth, maxHeight);
+    context.drawImage(logo, x, y + (maxHeight - size.height) / 2, size.width, size.height);
     return;
   }
 
@@ -194,7 +236,7 @@ function drawLogoOrFallback(
   context.fillStyle = "rgb(26, 0, 70)";
   context.textAlign = "left";
   context.textBaseline = "middle";
-  context.fillText(fallbackText, x, y + height / 2);
+  context.fillText(fallbackText, x, y + maxHeight / 2);
 }
 
 function drawCertificateBackground(context: CanvasRenderingContext2D, width: number, height: number) {

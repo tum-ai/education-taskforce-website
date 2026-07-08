@@ -98,4 +98,49 @@ describe("certificate browser renderer", () => {
     expect(pdfText).toContain("/Subtype /Image");
     expect(pdfText).toContain("/Filter /DCTDecode");
   });
+
+  it("fits certificate logos without distorting their aspect ratios", async () => {
+    const { canvas, context } = createMockCanvas();
+    const originalCreateElement = document.createElement.bind(document);
+    vi.spyOn(document, "createElement").mockImplementation((tagName: string) => {
+      if (tagName === "canvas") {
+        return canvas as unknown as HTMLCanvasElement;
+      }
+
+      return originalCreateElement(tagName);
+    });
+
+    const tumAiLogo = { naturalHeight: 405.94, naturalWidth: 1640.05 } as HTMLImageElement;
+    const schlossElmauLogo = { naturalHeight: 500, naturalWidth: 500 } as HTMLImageElement;
+    const tumAiContainedHeight = 112 * (tumAiLogo.naturalHeight / tumAiLogo.naturalWidth);
+
+    await createCertificatePdfFromContent(
+      createCertificateContent({ participantName: "Walter" }),
+      {
+        height: 900,
+        width: 1400,
+      },
+      {
+        schlossElmauLogo,
+        tumAiLogo,
+      },
+    );
+
+    expect(context.drawImage).toHaveBeenNthCalledWith(
+      1,
+      tumAiLogo,
+      expect.any(Number),
+      expect.any(Number),
+      112,
+      expect.closeTo(tumAiContainedHeight, 5),
+    );
+    expect(context.drawImage).toHaveBeenNthCalledWith(
+      2,
+      schlossElmauLogo,
+      expect.any(Number),
+      expect.any(Number),
+      34,
+      34,
+    );
+  });
 });

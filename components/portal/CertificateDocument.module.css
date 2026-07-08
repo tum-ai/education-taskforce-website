@@ -51,6 +51,29 @@
   text-align: center;
 }
 
+.brandLogos {
+  display: inline-flex;
+  align-items: center;
+  justify-self: center;
+  gap: 28px;
+  min-height: 48px;
+}
+
+.brandLogos img {
+  display: block;
+  object-fit: contain;
+}
+
+.tumAiLogo {
+  width: 138px;
+  height: 34px;
+}
+
+.schlossElmauLogo {
+  width: 42px;
+  height: 42px;
+}
+
 .brand {
   justify-self: center;
   border-radius: var(--radius-md);
@@ -135,6 +158,10 @@
 
   .languageToggle button {
     flex: 1;
+  }
+
+  .brandLogos {
+    gap: 18px;
   }
 
   .footer {

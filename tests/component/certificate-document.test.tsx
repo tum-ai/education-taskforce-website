@@ -8,6 +8,14 @@ describe("CertificateDocument", () => {
     render(<CertificateDocument participantName="Walter" />);
 
     expect(screen.getByLabelText("Certificate for Walter")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "TUM.ai" })).toHaveAttribute(
+      "src",
+      "/brand-assets/TUM.ai logo dark purple color.svg",
+    );
+    expect(screen.getByRole("img", { name: "Schloss Elmau" })).toHaveAttribute(
+      "src",
+      "/brand-assets/Schloss-Elmau-Logo-Black.png",
+    );
     expect(screen.getByRole("heading", { name: "Walter" })).toBeInTheDocument();
     expect(screen.getByText(/This certifies that Walter has successfully completed/i)).toBeInTheDocument();
     expect(screen.getByText(/AI tools/i)).toBeInTheDocument();

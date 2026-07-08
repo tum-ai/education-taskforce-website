@@ -11,6 +11,9 @@ import {
 } from "@/lib/domain/certificate";
 import styles from "./CertificateDocument.module.css";
 
+const TUM_AI_LOGO_PATH = "/brand-assets/TUM.ai logo dark purple color.svg";
+const SCHLOSS_ELMAU_LOGO_PATH = "/brand-assets/Schloss-Elmau-Logo-Black.png";
+
 type CertificateDocumentProps = {
   participantName: string;
 };
@@ -79,7 +82,12 @@ export function CertificateDocument({ participantName }: CertificateDocumentProp
         </Button>
       </div>
       <article className={styles.certificate} ref={certificateRef} aria-label={`Certificate for ${participantName}`}>
-        <div className={styles.brand}>TUM.ai</div>
+        <div className={styles.brandLogos}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img alt="TUM.ai" className={styles.tumAiLogo} height="34" src={TUM_AI_LOGO_PATH} width="138" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img alt="Schloss Elmau" className={styles.schlossElmauLogo} height="42" src={SCHLOSS_ELMAU_LOGO_PATH} width="42" />
+        </div>
         <p className={styles.kicker}>{content.subtitle}</p>
         <h1>{content.participantName}</h1>
         <p className={styles.statement}>{content.statement}</p>
