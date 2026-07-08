@@ -84,16 +84,9 @@ describe("certificate browser renderer", () => {
     expect(context.stroke).toHaveBeenCalledTimes(3);
     expect(context.drawImage).toHaveBeenCalledTimes(2);
     expect(context.fillText).toHaveBeenCalledWith("Walter", expect.any(Number), expect.any(Number));
-    expect(context.fillText).toHaveBeenCalledWith(
-      expect.stringContaining("TUM.ai brings AI education"),
-      expect.any(Number),
-      expect.any(Number),
-    );
-    expect(context.fillText).toHaveBeenCalledWith(
-      expect.stringContaining("Schloss Elmau provides the inspiring setting"),
-      expect.any(Number),
-      expect.any(Number),
-    );
+    const renderedText = context.fillText.mock.calls.map((call) => String(call[0]));
+    expect(renderedText.some((text) => text.includes("TUM.ai brings"))).toBe(false);
+    expect(renderedText.some((text) => text.includes("Schloss Elmau provides"))).toBe(false);
     expect(canvas.toDataURL).toHaveBeenCalledWith("image/jpeg", 0.98);
     expect(pdfText).toContain("/Subtype /Image");
     expect(pdfText).toContain("/Filter /DCTDecode");
@@ -112,7 +105,7 @@ describe("certificate browser renderer", () => {
 
     const tumAiLogo = { naturalHeight: 405.94, naturalWidth: 1640.05 } as HTMLImageElement;
     const schlossElmauLogo = { naturalHeight: 500, naturalWidth: 500 } as HTMLImageElement;
-    const tumAiContainedHeight = 112 * (tumAiLogo.naturalHeight / tumAiLogo.naturalWidth);
+    const tumAiContainedHeight = 156 * (tumAiLogo.naturalHeight / tumAiLogo.naturalWidth);
 
     await createCertificatePdfFromContent(
       createCertificateContent({ participantName: "Walter" }),
@@ -128,19 +121,30 @@ describe("certificate browser renderer", () => {
 
     expect(context.drawImage).toHaveBeenNthCalledWith(
       1,
-      tumAiLogo,
+      schlossElmauLogo,
+      76,
       expect.any(Number),
-      expect.any(Number),
-      112,
-      expect.closeTo(tumAiContainedHeight, 5),
+      48,
+      48,
     );
     expect(context.drawImage).toHaveBeenNthCalledWith(
       2,
-      schlossElmauLogo,
+      tumAiLogo,
+      709,
       expect.any(Number),
-      expect.any(Number),
-      34,
-      34,
+      156,
+      expect.closeTo(tumAiContainedHeight, 5),
     );
+    expect(context.fillText).toHaveBeenCalledWith("AI Edutainment", 76, expect.any(Number));
+    expect(context.fillText).toHaveBeenCalledWith("TUM.ai", 709, expect.any(Number));
+
+    const schlossLogoY = context.drawImage.mock.calls[0][2] as number;
+    const tumLogoY = context.drawImage.mock.calls[1][2] as number;
+    const courseTitleY = context.fillText.mock.calls.find((call) => call[0] === "AI Edutainment")?.[2] as number;
+    const organizerTitleY = context.fillText.mock.calls.find((call) => call[0] === "TUM.ai" && call[1] === 709)?.[2] as number;
+
+    expect(schlossLogoY).toBeLessThan(courseTitleY);
+    expect(tumLogoY).toBeLessThan(organizerTitleY);
+    expect(Math.abs(tumLogoY - schlossLogoY)).toBeLessThan(6);
   });
 });

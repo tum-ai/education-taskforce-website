@@ -160,22 +160,6 @@ function drawLeftLines(
   });
 }
 
-function getPartnerCopy(content: CertificateContent) {
-  if (content.subtitle === "Abschlusszertifikat") {
-    return {
-      schlossElmau:
-        "Schloss Elmau schafft den inspirierenden Ort, an dem konzentriertes Lernen offen, ruhig und besonders werden kann.",
-      tumAi: "TUM.ai bringt KI-Bildung, Mentoring und kreative Technologiepraxis in den Kurs.",
-    };
-  }
-
-  return {
-    schlossElmau:
-      "Schloss Elmau provides the inspiring setting where focused learning can feel open, calm, and special.",
-    tumAi: "TUM.ai brings AI education, mentoring, and creative technology practice to the course.",
-  };
-}
-
 function getNumericDimension(value: unknown) {
   return typeof value === "number" && Number.isFinite(value) && value > 0 ? value : 0;
 }
@@ -278,36 +262,6 @@ function fitFontSize(context: CanvasRenderingContext2D, text: string, initialSiz
   return size;
 }
 
-function drawPartnerBlock(
-  context: CanvasRenderingContext2D,
-  content: CertificateContent,
-  assets: CertificateRenderAssets,
-  padding: number,
-  y: number,
-  contentWidth: number,
-) {
-  const partnerCopy = getPartnerCopy(content);
-  const columnGap = 34;
-  const columnWidth = (contentWidth - columnGap) / 2;
-  const logoHeight = 34;
-  const textSize = 13;
-  const textLineHeight = textSize * 1.45;
-  const leftX = padding;
-  const rightX = padding + columnWidth + columnGap;
-
-  drawLogoOrFallback(context, assets.tumAiLogo, "TUM.ai", leftX, y, 112, logoHeight);
-  drawLogoOrFallback(context, assets.schlossElmauLogo, "Schloss Elmau", rightX, y, 158, logoHeight);
-
-  setFont(context, textSize, 650);
-  context.fillStyle = "rgb(75, 72, 86)";
-  const tumAiLines = wrapCanvasText(context, partnerCopy.tumAi, columnWidth);
-  const schlossElmauLines = wrapCanvasText(context, partnerCopy.schlossElmau, columnWidth);
-  drawLeftLines(context, tumAiLines, leftX, y + logoHeight + 16, textLineHeight);
-  drawLeftLines(context, schlossElmauLines, rightX, y + logoHeight + 16, textLineHeight);
-
-  return logoHeight + 16 + Math.max(tumAiLines.length, schlossElmauLines.length) * textLineHeight;
-}
-
 function drawCertificate(
   context: CanvasRenderingContext2D,
   content: CertificateContent,
@@ -324,7 +278,9 @@ function drawCertificate(
   const titleSize = clamp(width * 0.07, 48, 106);
   const statementSize = clamp(width * 0.02, 19, 25);
   const descriptionSize = clamp(width * 0.015, 16, 19);
-  const partnerBlockHeight = 92;
+  const footerLogoWidth = 156;
+  const footerLogoHeight = 48;
+  const footerLogoGap = 12;
   const footerSize = 15;
   const footerStrongSize = 16;
 
@@ -340,7 +296,14 @@ function drawCertificate(
   const statementLineHeight = statementSize * 1.55;
   const descriptionLineHeight = descriptionSize * 1.55;
   const footerLineHeight = footerSize * 1.35;
-  const footerHeight = 1 + 22 + footerStrongSize * 1.25 + 4 + Math.max(leftFooterLines.length, rightFooterLines.length) * footerLineHeight;
+  const footerHeight =
+    1 +
+    22 +
+    footerLogoHeight +
+    footerLogoGap +
+    footerStrongSize * 1.25 +
+    4 +
+    Math.max(leftFooterLines.length, rightFooterLines.length) * footerLineHeight;
   const blockHeight =
     brandHeight +
     gap +
@@ -352,8 +315,6 @@ function drawCertificate(
     gap +
     descriptionLines.length * descriptionLineHeight +
     20 +
-    partnerBlockHeight +
-    22 +
     footerHeight;
   let y = Math.max(padding, (height - blockHeight) / 2);
 
@@ -390,8 +351,6 @@ function drawCertificate(
   drawCenteredLines(context, descriptionLines, centerX, y + descriptionSize, descriptionLineHeight);
   y += descriptionLines.length * descriptionLineHeight + 20;
 
-  y += drawPartnerBlock(context, content, assets, padding, y, contentWidth) + 22;
-
   context.strokeStyle = "rgba(82, 53, 115, 0.18)";
   context.lineWidth = 1;
   context.beginPath();
@@ -401,6 +360,10 @@ function drawCertificate(
   y += 22;
 
   const footerRightX = padding + footerColumnWidth + 18;
+  drawLogoOrFallback(context, assets.schlossElmauLogo, "Schloss Elmau", padding, y, footerLogoWidth, footerLogoHeight);
+  drawLogoOrFallback(context, assets.tumAiLogo, "TUM.ai", footerRightX, y, footerLogoWidth, footerLogoHeight);
+  y += footerLogoHeight + footerLogoGap;
+
   setFont(context, footerStrongSize, 850);
   context.fillStyle = "rgb(26, 0, 70)";
   context.textBaseline = "alphabetic";

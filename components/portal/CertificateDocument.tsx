@@ -82,22 +82,24 @@ export function CertificateDocument({ participantName }: CertificateDocumentProp
         </Button>
       </div>
       <article className={styles.certificate} ref={certificateRef} aria-label={`Certificate for ${participantName}`}>
-        <div className={styles.brandLogos}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img alt="TUM.ai" className={styles.tumAiLogo} height="34" src={TUM_AI_LOGO_PATH} width="138" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img alt="Schloss Elmau" className={styles.schlossElmauLogo} height="42" src={SCHLOSS_ELMAU_LOGO_PATH} width="42" />
-        </div>
         <p className={styles.kicker}>{content.subtitle}</p>
         <h1>{content.participantName}</h1>
         <p className={styles.statement}>{content.statement}</p>
         <p className={styles.description}>{content.description}</p>
         <div className={styles.footer}>
           <div>
+            <span className={styles.logoFrame}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img alt="Schloss Elmau" src={SCHLOSS_ELMAU_LOGO_PATH} />
+            </span>
             <strong>{content.courseName}</strong>
             <span>{content.footerLeft}</span>
           </div>
           <div>
+            <span className={styles.logoFrame}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img alt="TUM.ai" src={TUM_AI_LOGO_PATH} />
+            </span>
             <strong>{content.organizerName}</strong>
             <span>{content.footerRight}</span>
           </div>

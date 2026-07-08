@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { ParticipantPreview } from "@/components/dev/ParticipantPreview";
+import { canRenderLocalPreview } from "@/lib/dev/preview";
 
 export const dynamic = "force-dynamic";
 
@@ -8,8 +9,8 @@ export const metadata = {
   title: "Participant Preview",
 };
 
-export default function DevParticipantPreviewPage() {
-  if (process.env.NODE_ENV !== "development") {
+export default async function DevParticipantPreviewPage() {
+  if (!(await canRenderLocalPreview())) {
     notFound();
   }
 

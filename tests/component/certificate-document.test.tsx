@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { CertificateDocument } from "@/components/portal/CertificateDocument";
 
@@ -16,6 +16,12 @@ describe("CertificateDocument", () => {
       "src",
       "/brand-assets/Schloss-Elmau-Logo-Black.png",
     );
+    const courseColumn = screen.getByText("AI Edutainment").closest("div");
+    const organizerColumn = screen.getByText("Student Initiative at Technical University of Munich").closest("div");
+    expect(courseColumn).not.toBeNull();
+    expect(organizerColumn).not.toBeNull();
+    expect(within(courseColumn as HTMLElement).getByRole("img", { name: "Schloss Elmau" })).toBeInTheDocument();
+    expect(within(organizerColumn as HTMLElement).getByRole("img", { name: "TUM.ai" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Walter" })).toBeInTheDocument();
     expect(screen.getByText(/This certifies that Walter has successfully completed/i)).toBeInTheDocument();
     expect(screen.getByText(/AI tools/i)).toBeInTheDocument();
