@@ -11,7 +11,7 @@ import {
 } from "@/lib/domain/certificate";
 import styles from "./CertificateDocument.module.css";
 
-const TUM_AI_LOGO_PATH = "/brand-assets/TUM.ai logo dark purple color.svg";
+const TUM_AI_LOGO_PATH = "/brand-assets/TUM.ai-logo-dark-purple.png";
 const SCHLOSS_ELMAU_LOGO_PATH = "/brand-assets/Schloss-Elmau-Logo-Black.png";
 
 type CertificateDocumentProps = {
@@ -90,7 +90,13 @@ export function CertificateDocument({ participantName }: CertificateDocumentProp
           <div>
             <span className={styles.logoFrame}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img alt="Schloss Elmau" src={SCHLOSS_ELMAU_LOGO_PATH} />
+              <img
+                alt="Schloss Elmau"
+                className={styles.schlossLogo}
+                height={48}
+                src={SCHLOSS_ELMAU_LOGO_PATH}
+                width={48}
+              />
             </span>
             <strong>{content.courseName}</strong>
             <span>{content.footerLeft}</span>
@@ -98,7 +104,7 @@ export function CertificateDocument({ participantName }: CertificateDocumentProp
           <div>
             <span className={styles.logoFrame}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img alt="TUM.ai" src={TUM_AI_LOGO_PATH} />
+              <img alt="TUM.ai" className={styles.tumAiLogo} height={39} src={TUM_AI_LOGO_PATH} width={156} />
             </span>
             <strong>{content.organizerName}</strong>
             <span>{content.footerRight}</span>

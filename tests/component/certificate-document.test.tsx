@@ -8,14 +8,14 @@ describe("CertificateDocument", () => {
     render(<CertificateDocument participantName="Walter" />);
 
     expect(screen.getByLabelText("Certificate for Walter")).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "TUM.ai" })).toHaveAttribute(
-      "src",
-      "/brand-assets/TUM.ai logo dark purple color.svg",
-    );
-    expect(screen.getByRole("img", { name: "Schloss Elmau" })).toHaveAttribute(
-      "src",
-      "/brand-assets/Schloss-Elmau-Logo-Black.png",
-    );
+    const tumAiLogo = screen.getByRole("img", { name: "TUM.ai" });
+    const schlossElmauLogo = screen.getByRole("img", { name: "Schloss Elmau" });
+    expect(tumAiLogo).toHaveAttribute("src", "/brand-assets/TUM.ai-logo-dark-purple.png");
+    expect(tumAiLogo).toHaveAttribute("width", "156");
+    expect(tumAiLogo).toHaveAttribute("height", "39");
+    expect(schlossElmauLogo).toHaveAttribute("src", "/brand-assets/Schloss-Elmau-Logo-Black.png");
+    expect(schlossElmauLogo).toHaveAttribute("width", "48");
+    expect(schlossElmauLogo).toHaveAttribute("height", "48");
     const courseColumn = screen.getByText("AI Edutainment").closest("div");
     const organizerColumn = screen.getByText("Student Initiative at Technical University of Munich").closest("div");
     expect(courseColumn).not.toBeNull();

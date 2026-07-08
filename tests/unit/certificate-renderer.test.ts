@@ -1,49 +1,18 @@
+import html2canvas from "html2canvas";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createCertificatePdfFromContent } from "@/lib/browser/certificate-render";
+import { createCertificatePdfFromElement } from "@/lib/browser/certificate-render";
 import { createCertificateContent } from "@/lib/domain/certificate";
 
-function createMockCanvas() {
-  const gradient = { addColorStop: vi.fn() };
-  const context = {
-    beginPath: vi.fn(),
-    clearRect: vi.fn(),
-    clip: vi.fn(),
-    closePath: vi.fn(),
-    createLinearGradient: vi.fn(() => gradient),
-    createRadialGradient: vi.fn(() => gradient),
-    drawImage: vi.fn(),
-    fill: vi.fn(),
-    fillRect: vi.fn(),
-    fillText: vi.fn(),
-    lineTo: vi.fn(),
-    measureText: vi.fn((text: string) => ({ width: text.length * 9 })),
-    moveTo: vi.fn(),
-    quadraticCurveTo: vi.fn(),
-    rect: vi.fn(),
-    restore: vi.fn(),
-    save: vi.fn(),
-    scale: vi.fn(),
-    stroke: vi.fn(),
-    strokeRect: vi.fn(),
-    fillStyle: "",
-    font: "",
-    globalAlpha: 1,
-    lineWidth: 1,
-    shadowBlur: 0,
-    shadowColor: "",
-    shadowOffsetY: 0,
-    strokeStyle: "",
-    textAlign: "start",
-    textBaseline: "alphabetic",
-  };
-  const canvas = {
-    getContext: vi.fn(() => context),
-    height: 0,
-    toDataURL: vi.fn(() => `data:image/jpeg;base64,${btoa("\xff\xd8\xff\xd9")}`),
-    width: 0,
-  };
+vi.mock("html2canvas", () => ({
+  default: vi.fn(),
+}));
 
-  return { canvas, context };
+function createMockCanvas() {
+  return {
+    height: 900,
+    toDataURL: vi.fn(() => `data:image/jpeg;base64,${btoa("\xff\xd8\xff\xd9")}`),
+    width: 1400,
+  };
 }
 
 describe("certificate browser renderer", () => {
@@ -51,100 +20,100 @@ describe("certificate browser renderer", () => {
     vi.restoreAllMocks();
   });
 
-  it("renders certificate PDFs without the taint-prone SVG foreignObject path", async () => {
-    const { canvas, context } = createMockCanvas();
-    const originalCreateElement = document.createElement.bind(document);
-    URL.createObjectURL = vi.fn();
-    const createObjectUrlSpy = vi.spyOn(URL, "createObjectURL").mockImplementation(() => {
-      throw new Error("The certificate renderer must not use SVG object URLs.");
+  it("screenshots the online certificate element and embeds that image in the PDF", async () => {
+    const canvas = createMockCanvas();
+    vi.mocked(html2canvas).mockResolvedValue(canvas as unknown as HTMLCanvasElement);
+    const element = document.createElement("article");
+    vi.spyOn(element, "getBoundingClientRect").mockReturnValue({
+      bottom: 900,
+      height: 900,
+      left: 0,
+      right: 1400,
+      toJSON: () => ({}),
+      top: 0,
+      width: 1400,
+      x: 0,
+      y: 0,
     });
-    vi.spyOn(document, "createElement").mockImplementation((tagName: string) => {
-      if (tagName === "canvas") {
-        return canvas as unknown as HTMLCanvasElement;
-      }
 
-      return originalCreateElement(tagName);
-    });
-
-    const pdf = await createCertificatePdfFromContent(
-      createCertificateContent({ participantName: "Walter" }),
-      {
-        height: 900,
-        width: 1400,
-      },
-      {
-        schlossElmauLogo: {} as CanvasImageSource,
-        tumAiLogo: {} as CanvasImageSource,
-      },
-    );
+    const pdf = await createCertificatePdfFromElement(element, createCertificateContent({ participantName: "Walter" }));
     const pdfText = new TextDecoder("latin1").decode(pdf);
 
-    expect(createObjectUrlSpy).not.toHaveBeenCalled();
-    expect(context.createRadialGradient).not.toHaveBeenCalled();
-    expect(context.stroke).toHaveBeenCalledTimes(3);
-    expect(context.drawImage).toHaveBeenCalledTimes(2);
-    expect(context.fillText).toHaveBeenCalledWith("Walter", expect.any(Number), expect.any(Number));
-    const renderedText = context.fillText.mock.calls.map((call) => String(call[0]));
-    expect(renderedText.some((text) => text.includes("TUM.ai brings"))).toBe(false);
-    expect(renderedText.some((text) => text.includes("Schloss Elmau provides"))).toBe(false);
+    expect(html2canvas).toHaveBeenCalledWith(element, {
+      backgroundColor: null,
+      height: 900,
+      logging: false,
+      onclone: expect.any(Function),
+      scale: 2,
+      scrollX: 0,
+      scrollY: 0,
+      useCORS: true,
+      width: 1400,
+      windowHeight: 768,
+      windowWidth: 1024,
+    });
+    const clonedElement = document.createElement("article");
+    const html2canvasOptions = vi.mocked(html2canvas).mock.calls[0]?.[1];
+    html2canvasOptions?.onclone?.(document, clonedElement);
+    expect(clonedElement).toHaveStyle({
+      boxSizing: "border-box",
+      height: "900px",
+      minHeight: "900px",
+      width: "1400px",
+    });
     expect(canvas.toDataURL).toHaveBeenCalledWith("image/jpeg", 0.98);
     expect(pdfText).toContain("/Subtype /Image");
     expect(pdfText).toContain("/Filter /DCTDecode");
   });
 
-  it("fits certificate logos without distorting their aspect ratios", async () => {
-    const { canvas, context } = createMockCanvas();
-    const originalCreateElement = document.createElement.bind(document);
-    vi.spyOn(document, "createElement").mockImplementation((tagName: string) => {
-      if (tagName === "canvas") {
-        return canvas as unknown as HTMLCanvasElement;
-      }
-
-      return originalCreateElement(tagName);
+  it("rejects hidden certificate elements before attempting a screenshot", async () => {
+    const element = document.createElement("article");
+    vi.spyOn(element, "getBoundingClientRect").mockReturnValue({
+      bottom: 0,
+      height: 0,
+      left: 0,
+      right: 0,
+      toJSON: () => ({}),
+      top: 0,
+      width: 0,
+      x: 0,
+      y: 0,
     });
 
-    const tumAiLogo = { naturalHeight: 405.94, naturalWidth: 1640.05 } as HTMLImageElement;
-    const schlossElmauLogo = { naturalHeight: 500, naturalWidth: 500 } as HTMLImageElement;
-    const tumAiContainedHeight = 156 * (tumAiLogo.naturalHeight / tumAiLogo.naturalWidth);
-
-    await createCertificatePdfFromContent(
-      createCertificateContent({ participantName: "Walter" }),
-      {
-        height: 900,
-        width: 1400,
-      },
-      {
-        schlossElmauLogo,
-        tumAiLogo,
-      },
+    await expect(createCertificatePdfFromElement(element, createCertificateContent({ participantName: "Walter" }))).rejects.toThrow(
+      "Certificate preview must be visible before it can be downloaded.",
     );
+    expect(html2canvas).not.toHaveBeenCalled();
+  });
 
-    expect(context.drawImage).toHaveBeenNthCalledWith(
-      1,
-      schlossElmauLogo,
-      76,
-      expect.any(Number),
-      48,
-      48,
-    );
-    expect(context.drawImage).toHaveBeenNthCalledWith(
-      2,
-      tumAiLogo,
-      709,
-      expect.any(Number),
-      156,
-      expect.closeTo(tumAiContainedHeight, 5),
-    );
-    expect(context.fillText).toHaveBeenCalledWith("AI Edutainment", 76, expect.any(Number));
-    expect(context.fillText).toHaveBeenCalledWith("TUM.ai", 709, expect.any(Number));
+  it("does not block forever when an image already completed without dimensions", async () => {
+    const canvas = createMockCanvas();
+    vi.mocked(html2canvas).mockResolvedValue(canvas as unknown as HTMLCanvasElement);
+    const element = document.createElement("article");
+    const brokenImage = document.createElement("img");
+    Object.defineProperties(brokenImage, {
+      complete: { value: true },
+      naturalWidth: { value: 0 },
+    });
+    element.append(brokenImage);
+    vi.spyOn(element, "getBoundingClientRect").mockReturnValue({
+      bottom: 900,
+      height: 900,
+      left: 0,
+      right: 1400,
+      toJSON: () => ({}),
+      top: 0,
+      width: 1400,
+      x: 0,
+      y: 0,
+    });
 
-    const schlossLogoY = context.drawImage.mock.calls[0][2] as number;
-    const tumLogoY = context.drawImage.mock.calls[1][2] as number;
-    const courseTitleY = context.fillText.mock.calls.find((call) => call[0] === "AI Edutainment")?.[2] as number;
-    const organizerTitleY = context.fillText.mock.calls.find((call) => call[0] === "TUM.ai" && call[1] === 709)?.[2] as number;
+    const result = await Promise.race([
+      createCertificatePdfFromElement(element, createCertificateContent({ participantName: "Walter" })).then(() => "rendered"),
+      new Promise((resolve) => setTimeout(() => resolve("timed out"), 25)),
+    ]);
 
-    expect(schlossLogoY).toBeLessThan(courseTitleY);
-    expect(tumLogoY).toBeLessThan(organizerTitleY);
-    expect(Math.abs(tumLogoY - schlossLogoY)).toBeLessThan(6);
+    expect(result).toBe("rendered");
+    expect(html2canvas).toHaveBeenCalled();
   });
 });
