@@ -1,0 +1,102 @@
+.card {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(16px, 3vw, 28px);
+  overflow: hidden;
+  border: 1px solid rgb(82 53 115 / 12%);
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(circle at 88% 12%, rgb(30 168 150 / 18%), transparent 24%),
+    linear-gradient(135deg, rgb(245 239 255 / 72%), var(--color-white));
+  box-shadow:
+    0 3px 10px rgb(27 0 73 / 9%),
+    0 22px 52px rgb(27 0 73 / 15%);
+  padding: clamp(20px, 3vw, 30px);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: rgb(154 100 217 / 34%);
+  box-shadow: var(--shadow-md);
+}
+
+.card:focus-visible {
+  outline: 3px solid rgb(154 100 217 / 48%);
+  outline-offset: 4px;
+}
+
+.icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--color-indigo-950);
+  color: var(--color-mint-500);
+}
+
+.copy {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+}
+
+.copy span {
+  color: var(--color-purple-700);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.copy h2 {
+  margin: 0;
+  color: var(--color-indigo-950);
+  font-size: clamp(1.2rem, 2.2vw, 1.7rem);
+  letter-spacing: 0;
+  line-height: 1.14;
+}
+
+.copy p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--color-grey-700);
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.button {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgb(82 53 115 / 18%);
+  border-radius: 999px;
+  background: var(--color-indigo-950);
+  color: var(--color-white);
+  font-size: 0.86rem;
+  font-weight: 900;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
+.button svg {
+  color: var(--color-mint-500);
+}
+
+@media (max-width: 760px) {
+  .card {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .button {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+}
